@@ -3,15 +3,13 @@ package hu.progmasters.animalShelter.domain;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
 @Entity
-public class Cat {
+public class Cat implements Animal{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,6 +24,9 @@ public class Cat {
     private Integer needsId;
 
     private Integer educationId;
+
+    @OneToMany(mappedBy = "education")
+    private List<Education> educations;
 
     private boolean goneStray;
 }

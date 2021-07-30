@@ -5,13 +5,11 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.PositiveOrZero;
-import java.util.ArrayList;
-import java.util.List;
 
 @Data
 @NoArgsConstructor
 @Entity
-public class Dog {
+public class Dog implements Animal{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

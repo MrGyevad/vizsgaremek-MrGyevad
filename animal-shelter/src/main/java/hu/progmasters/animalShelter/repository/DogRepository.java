@@ -21,8 +21,7 @@ public class DogRepository {
     }
 
     public Dog update(Dog toUpdate){
-        Dog updated = entityManager.merge(toUpdate);
-        return updated;
+        return entityManager.merge(toUpdate);
     }
 
     public Dog findById(Integer id){
@@ -30,9 +29,7 @@ public class DogRepository {
     }
 
     public void delete(Dog toDelete){
-        //TODO StrayRepository-t megírni, a törölt kutyáknak, egy másik táblázat.
         toDelete.setGoneStray(true);
-        // StrayService.save(toDelete);
         entityManager.remove(toDelete);
     }
 
@@ -45,5 +42,4 @@ public class DogRepository {
                 .setParameter("gender", gender)
                 .getResultList();
     }
-
 }

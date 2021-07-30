@@ -1,0 +1,12 @@
+spring:
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3310/animal-shelter?createDatabaseIfNotExist=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC&autoReconnect=true
+    username: root
+    password: 1234
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+    show-sql: on

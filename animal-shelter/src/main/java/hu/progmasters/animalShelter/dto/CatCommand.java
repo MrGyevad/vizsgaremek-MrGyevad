@@ -4,14 +4,10 @@ import hu.progmasters.animalShelter.domain.Gender;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Id;
-
 @Data
 @NoArgsConstructor
-public class DogInfo {
+public class CatCommand {
 
-    @Id
-    private Integer id;
     private int age;
     private Gender gender;
     private String breed;
