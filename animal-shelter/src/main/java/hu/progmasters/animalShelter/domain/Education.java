@@ -24,5 +24,6 @@ public class Education {
     private boolean guardsTheHouse;
 
     @ManyToOne
-    private Animal animal;
+    private Dog dog;
+
 }

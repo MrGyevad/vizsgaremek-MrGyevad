@@ -2,10 +2,5 @@ package hu.progmasters.animalShelter.domain;
 
 
 public enum Gender {
-    SIRE,
-    BITCH,
-    PUSSY,
-    TOM
-
-
+    SIRE, BITCH, PUSSY, TOM
 }

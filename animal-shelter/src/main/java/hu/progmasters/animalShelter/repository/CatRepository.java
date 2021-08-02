@@ -16,6 +16,7 @@ public class CatRepository {
 
     public Cat save(Cat toSave) {
         entityManager.persist(toSave);
+        toSave.setId(toSave.getId()*2);
         return toSave;
     }
 

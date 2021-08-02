@@ -36,7 +36,11 @@ public class DogService {
 
     public DogInfo updateDog(Integer id, DogCommand command){
         Dog toUpdate = dogRepository.findById(id);
-        Dog updateInfo = modelMapper.map(command, Dog.class);
+        toUpdate.setAge(command.getAge());
+        toUpdate.setBreed(command.getBreed());
+        toUpdate.setName(command.getName());
+        toUpdate.setGoneStray(command.isGoneStray());
+        toUpdate.setGender(command.getGender());
         Dog updated = dogRepository.update(toUpdate);
         return modelMapper.map(updated, DogInfo.class);
     }
@@ -69,7 +73,8 @@ public class DogService {
 
     public DogInfo dogHasBeenFound(Integer id){
         Dog found = (Dog) strayRepository.findById(id);
-        Dog isAtHome = dogRepository.update(found);
+        Dog isAtHome = dogRepository.save(found);
+        Dog hasBeenFound = (Dog) strayRepository.hasBeenFound(isAtHome);
         return modelMapper.map(isAtHome, DogInfo.class);
     }
 }

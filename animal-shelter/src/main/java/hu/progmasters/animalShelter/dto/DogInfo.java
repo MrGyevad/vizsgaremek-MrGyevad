@@ -12,9 +12,9 @@ public class DogInfo {
 
     @Id
     private Integer id;
+    private String name;
     private int age;
     private Gender gender;
     private String breed;
-    private Integer needsId;
-    private Integer educationId;
+    private boolean goneStray;
 }

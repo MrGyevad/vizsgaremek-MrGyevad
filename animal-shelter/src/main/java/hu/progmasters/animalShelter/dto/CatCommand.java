@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CatCommand {
 
+    private String name;
     private int age;
     private Gender gender;
     private String breed;
