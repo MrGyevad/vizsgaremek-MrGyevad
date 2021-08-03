@@ -4,14 +4,18 @@ import hu.progmasters.animalShelter.domain.Gender;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
+
 @Data
 @NoArgsConstructor
 public class CatCommand {
 
     private String name;
     private int age;
-    private Gender gender;
     private String breed;
-    private Integer needsId;
-    private Integer educationId;
+    private Gender gender;
+    private LocalDateTime lastPlay;
+    private boolean hasWaterAndFood;
+    private boolean goneStray;
 }

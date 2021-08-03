@@ -17,9 +17,8 @@ public class StrayRepository {
         return animal;
     }
 
-    public Animal hasBeenFound(Animal animal){
+    public void hasBeenFound(Animal animal){
         entityManager.remove(animal);
-        return animal;
     }
 
     public Animal findById(Integer id){

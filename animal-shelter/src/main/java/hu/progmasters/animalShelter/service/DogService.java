@@ -5,12 +5,17 @@ import hu.progmasters.animalShelter.domain.Gender;
 import hu.progmasters.animalShelter.dto.DogCommand;
 import hu.progmasters.animalShelter.dto.DogInfo;
 import hu.progmasters.animalShelter.exception.DogNotFoundException;
+import hu.progmasters.animalShelter.exception.NotLegitTimeException;
 import hu.progmasters.animalShelter.repository.DogRepository;
 import hu.progmasters.animalShelter.repository.StrayRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.temporal.ChronoField;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,7 +34,16 @@ public class DogService {
     }
 
     public DogInfo saveDog(DogCommand command){
-        Dog toSave = modelMapper.map(command, Dog.class);
+        LocalDateTime ldt;
+        if (!command.getLastWalkString().trim().equals("")){
+            ldt = convertStringToLocalDateTime(command.getLastWalkString());
+        } else {
+            throw new NotLegitTimeException();
+        }
+
+        Dog toSave = new Dog();
+        toSave.setLastWalk(ldt);
+        toSave = modelMapper.map(command, Dog.class);
         Dog saved = dogRepository.save(toSave);
         return modelMapper.map(saved, DogInfo.class);
     }
@@ -41,6 +55,8 @@ public class DogService {
         toUpdate.setName(command.getName());
         toUpdate.setGoneStray(command.isGoneStray());
         toUpdate.setGender(command.getGender());
+        toUpdate.setHasWaterAndFood(command.isHasWaterAndFood());
+     //   toUpdate.setLastWalk(command.getLastWalk());
         Dog updated = dogRepository.update(toUpdate);
         return modelMapper.map(updated, DogInfo.class);
     }
@@ -72,9 +88,30 @@ public class DogService {
     }
 
     public DogInfo dogHasBeenFound(Integer id){
-        Dog found = (Dog) strayRepository.findById(id);
+        Dog found = new Dog();
+        try {
+            found = (Dog) strayRepository.findById(id);
+        } catch (DogNotFoundException dnfe) {
+            dnfe.printStackTrace();
+        }
+        strayRepository.hasBeenFound(found);
         Dog isAtHome = dogRepository.save(found);
-        Dog hasBeenFound = (Dog) strayRepository.hasBeenFound(isAtHome);
+
         return modelMapper.map(isAtHome, DogInfo.class);
+    }
+
+    public static LocalDateTime convertStringToLocalDateTime(String strDate) {
+        String format = "yyyy-MM-dd hh:mm:ss";
+        DateTimeFormatter DATE_TME_FORMATTER =
+                new DateTimeFormatterBuilder().appendPattern(format)
+                        .parseDefaulting(ChronoField.YEAR, 0)
+                        .parseDefaulting(ChronoField.MONTH_OF_YEAR, 0)
+                        .parseDefaulting(ChronoField.DAY_OF_MONTH, 0)
+                        .parseDefaulting(ChronoField.HOUR_OF_DAY, 0)
+                        .parseDefaulting(ChronoField.MINUTE_OF_HOUR, 0)
+                        .parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0)
+                        .toFormatter();
+        LocalDateTime ldt = LocalDateTime.parse(strDate, DATE_TME_FORMATTER);
+        return ldt;
     }
 }

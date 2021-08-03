@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Id;
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -14,7 +15,9 @@ public class DogInfo {
     private Integer id;
     private String name;
     private int age;
-    private Gender gender;
     private String breed;
+    private Gender gender;
+    private LocalDateTime lastWalk;
+    private boolean hasWaterAndFood;
     private boolean goneStray;
 }

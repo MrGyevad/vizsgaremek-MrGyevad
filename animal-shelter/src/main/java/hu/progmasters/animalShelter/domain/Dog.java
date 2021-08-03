@@ -5,8 +5,9 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import javax.validation.constraints.PastOrPresent;
 import javax.validation.constraints.PositiveOrZero;
-import java.util.List;
+import java.time.LocalDateTime;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -27,11 +28,10 @@ public class Dog extends Animal{
     @Enumerated(EnumType.STRING)
     private Gender gender;
 
-    @OneToMany(mappedBy = "dog")
-    private List<Needs> needs;
+    @PastOrPresent
+    private LocalDateTime lastWalk;
 
-    @OneToMany(mappedBy = "dog")
-    private List<Education> educations;
+    private boolean hasWaterAndFood;
 
     private boolean goneStray;
 }

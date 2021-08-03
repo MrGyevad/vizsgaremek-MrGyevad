@@ -14,6 +14,8 @@ public class AnimalInfo {
     public Integer id;
     private String name;
     private int age;
-    private Gender gender;
     private String breed;
+    private Gender gender;
+    private boolean hasWaterAndFood;
+    private boolean goneStray;
 }

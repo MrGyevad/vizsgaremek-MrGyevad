@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Id;
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -14,8 +15,9 @@ public class CatInfo {
     private Integer id;
     private String name;
     private int age;
-    private Gender gender;
     private String breed;
-    private Integer needsId;
-    private Integer educationId;
+    private Gender gender;
+    private LocalDateTime lastPlay;
+    private boolean hasWaterAndFood;
+    private boolean goneStray;
 }

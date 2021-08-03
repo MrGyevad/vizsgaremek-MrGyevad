@@ -1,9 +1,11 @@
 package hu.progmasters.animalShelter.service;
 
 import hu.progmasters.animalShelter.domain.Cat;
+import hu.progmasters.animalShelter.domain.Dog;
 import hu.progmasters.animalShelter.domain.Gender;
 import hu.progmasters.animalShelter.dto.CatCommand;
 import hu.progmasters.animalShelter.dto.CatInfo;
+import hu.progmasters.animalShelter.dto.DogInfo;
 import hu.progmasters.animalShelter.exception.CatNotFoundException;
 import hu.progmasters.animalShelter.repository.CatRepository;
 import hu.progmasters.animalShelter.repository.StrayRepository;
@@ -36,7 +38,13 @@ public class CatService {
 
     public CatInfo updateCat(Integer id, CatCommand command){
         Cat toUpdate = catRepository.findById(id);
-        Cat updateInfo = modelMapper.map(command, Cat.class);
+        toUpdate.setAge(command.getAge());
+        toUpdate.setBreed(command.getBreed());
+        toUpdate.setName(command.getName());
+        toUpdate.setGoneStray(command.isGoneStray());
+        toUpdate.setGender(command.getGender());
+        toUpdate.setHasWaterAndFood(command.isHasWaterAndFood());
+        toUpdate.setLastPlay(command.getLastPlay());
         Cat updated = catRepository.update(toUpdate);
         return modelMapper.map(updated, CatInfo.class);
     }

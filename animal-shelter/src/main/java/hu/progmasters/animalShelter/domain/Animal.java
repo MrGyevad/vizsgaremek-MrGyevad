@@ -7,8 +7,8 @@ public abstract class Animal {
     private int age;
     private Gender gender;
     private String breed;
-    private Integer needsId;
-    private Integer educationId;
+    private boolean hasWaterAndFood;
+    private boolean goneStray;
 
 
 }

@@ -5,8 +5,9 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import javax.validation.constraints.PastOrPresent;
 import javax.validation.constraints.PositiveOrZero;
-import java.util.List;
+import java.time.LocalDateTime;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -26,12 +27,11 @@ public class Cat extends Animal{
 
     @Enumerated(EnumType.STRING)
     private Gender gender;
-/*
-    @OneToMany(mappedBy = "cat")
-    private List<Needs> needs;
 
-    @OneToMany(mappedBy = "cat")
-    private List<Education> educations;
-*/
+    @PastOrPresent
+    private LocalDateTime lastPlay;
+
+    private boolean hasWaterAndFood;
+
     private boolean goneStray;
 }
