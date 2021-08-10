@@ -4,6 +4,8 @@ A feladatod egy backend API projekt elkészítése, általad választott témáb
 A témákhoz összeszedtünk néhány ötletet, kérlek írd be magad ahhoz a témához, amit te választanál. Érdemes mindenkinek egyedi alkalmazást készíteni, próbáljatok meg osztozkodni a témákon.  
 Nem csak ezek közül a témák közül lehet választani, ha saját ötleted van, akkor nyugodtan írd hozzá a listához.
 
+Csóró állatmenhelyeknek szeretném ingyenesen átadni a szoftvert, jótékonysági célból. A jövőben szeretnék még birkákat és nyulakat is beletenni.
+
 [témaötletek](https://docs.google.com/document/d/1F30RkobWaX8L44ikgZ3GXKc0w7bEcgfUXIGEzSGSwHM/edit?usp=sharing)
 
 ## Követelmények
