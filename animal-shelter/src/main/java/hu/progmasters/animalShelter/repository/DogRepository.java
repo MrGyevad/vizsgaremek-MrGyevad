@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -29,7 +30,7 @@ public class DogRepository {
     }
 
     public void delete(Dog toDelete){
-        toDelete.setGoneStray(true);
+        toDelete.setAdopted(true);
         entityManager.remove(toDelete);
     }
 
@@ -41,5 +42,11 @@ public class DogRepository {
         return entityManager.createQuery("SELECT d FROM Dog d WHERE d.gender = :gender", Dog.class)
                 .setParameter("gender", gender)
                 .getResultList();
+    }
+
+    public Dog walkMeBoy(Integer id){
+        Dog walked = entityManager.find(Dog.class, id);
+        walked.setLastWalk(LocalDateTime.now());
+        return walked;
     }
 }

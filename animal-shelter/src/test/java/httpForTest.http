@@ -1,7 +1,23 @@
+POST http://localhost:8080/api/dog/adopt/2
+Content-Type: application/json
+
+###
+GET http://localhost:8080/api/
+Accept: application/json
+
+### List all animals
+GET http://localhost:8080/dog/bestfriend/1
+Accept: application/json
+
+### Get the best friend of dog with ID 1
+GET http://localhost:8080/api/dog/walk
+Accept: application/json
+
+### Walk all dogs, who need it
 GET http://localhost:8080/api/dog/1
 Accept: application/json
 
-###
+### Find dog with ID
 POST http://localhost:8080/api/dog
 Content-Type: application/json
 
@@ -9,40 +25,41 @@ Content-Type: application/json
   "age": 6,
   "breed": "Mudi",
   "gender": "SIRE",
-  "lastWalkString": "2021-08-03 16:00:00",
   "hasWaterAndFood": true,
-  "goneStray": false
+  "adopted": false
 }
-###
+### Create Sirion
 POST http://localhost:8080/api/dog
+Content-Type: application/json
+
+{"name": "Diego",
+  "age": 13,
+  "breed": "Máltai",
+  "gender": "SIRE",
+  "hasWaterAndFood": true,
+  "adopted": false
+}
+### Create Diego
+PUT http://localhost:8080/api/dog/2
 Content-Type: application/json
 
 {"name": "Diego",
   "age": 11,
   "gender": "SIRE",
   "breed": "Máltai",
-  "goneStray": false
+  "hasWaterAndFood": true,
+  "adopted": false
 }
-###
-PUT http://localhost:8080/api/dog/2
-Content-Type: application/json
-
-{"name": "Diego",
-  "age": 13,
-  "gender": "SIRE",
-  "breed": "Máltai",
-  "goneStray": false
-}
-###
+### Update Diego to correct age
 DELETE http://localhost:8080/api/dog/2
 Content-Type: application/json
 
-###
-PUT http://localhost:8080/api/dog/find/2
+### Delete dog with ID 2
+PUT http://localhost:8080/api/dog/walk/1
 Content-Type: application/json
 
-###
+###  Walk dog with ID 1
 GET http://localhost:8080/api/dog
 Accept: application/json
 
-###
+### List all dogs

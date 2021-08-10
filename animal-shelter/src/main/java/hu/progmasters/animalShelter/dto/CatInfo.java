@@ -19,5 +19,5 @@ public class CatInfo {
     private Gender gender;
     private LocalDateTime lastPlay;
     private boolean hasWaterAndFood;
-    private boolean goneStray;
+    private boolean adopted;
 }

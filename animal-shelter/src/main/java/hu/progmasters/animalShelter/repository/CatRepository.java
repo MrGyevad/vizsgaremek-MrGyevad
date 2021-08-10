@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -29,9 +30,7 @@ public class CatRepository {
     }
 
     public void delete(Cat toDelete) {
-        //TODO StrayRepository-t megírni, a törölt kutyáknak, egy másik táblázat.
-        toDelete.setGoneStray(true);
-        // StrayService.save(toDelete);
+        toDelete.setAdopted(true);
         entityManager.remove(toDelete);
     }
 
@@ -43,5 +42,11 @@ public class CatRepository {
         return entityManager.createQuery("SELECT d FROM Cat d WHERE d.gender = :gender", Cat.class)
                 .setParameter("gender", gender)
                 .getResultList();
+    }
+
+    public Cat playWithMeGirl(Integer id){
+        Cat played = entityManager.find(Cat.class, id);
+        played.setLastPlay(LocalDateTime.now());
+        return played;
     }
 }

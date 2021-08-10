@@ -1,5 +1,6 @@
 package hu.progmasters.animalShelter.domain;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -12,6 +13,7 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity
 public class Dog extends Animal{
 
@@ -33,5 +35,8 @@ public class Dog extends Animal{
 
     private boolean hasWaterAndFood;
 
-    private boolean goneStray;
+    private boolean adopted;
+
+    @OneToOne(mappedBy = "dog")
+    private BestFriend bestFriendId;
 }

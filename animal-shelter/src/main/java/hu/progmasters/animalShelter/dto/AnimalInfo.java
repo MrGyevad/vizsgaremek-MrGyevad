@@ -17,5 +17,5 @@ public class AnimalInfo {
     private String breed;
     private Gender gender;
     private boolean hasWaterAndFood;
-    private boolean goneStray;
+    private boolean adopted;
 }

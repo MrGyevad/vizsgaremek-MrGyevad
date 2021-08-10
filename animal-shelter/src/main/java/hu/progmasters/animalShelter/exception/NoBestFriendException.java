@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class CatNotFoundException extends RuntimeException {
+public class NoBestFriendException extends RuntimeException{
     private String field;
     private String errorMessage;
 }

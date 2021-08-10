@@ -35,14 +35,14 @@ public class DogRepositoryTest {
         toSave.setName("Sirion");
         toSave.setBreed("Moody");
         toSave.setAge(6);
-        toSave.setGoneStray(false);
+        toSave.setAdopted(false);
         assertTrue(dogRepository.findAll().isEmpty());
         Dog saved = dogRepository.save(toSave);
         assertEquals(1, dogRepository.findAll().size());
         assertEquals(1, saved.getId());
         assertEquals(6, saved.getAge());
         assertTrue(saved.isHasWaterAndFood());
-        assertFalse(saved.isGoneStray());
+        assertFalse(saved.isAdopted());
         assertEquals("Sirion", saved.getName());
         assertEquals("Moody", saved.getBreed());
         assertEquals(Gender.SIRE, saved.getGender());
@@ -64,17 +64,46 @@ public class DogRepositoryTest {
         toUpdate.setName("Diego");
         toUpdate.setBreed("Maltese");
         toUpdate.setAge(11);
-        toUpdate.setGoneStray(false);
+        toUpdate.setAdopted(false);
         Dog updated = dogRepository.update(toUpdate);
         assertEquals(1, dogRepository.findAll().size());
         assertEquals(1, updated.getId());
         assertEquals(11, dogRepository.findById(updated.getId()).getAge());
         assertTrue(updated.isHasWaterAndFood());
-        assertFalse(updated.isGoneStray());
+        assertFalse(updated.isAdopted());
         assertEquals("Diego", dogRepository.findById(1).getName());
         assertEquals("Maltese", updated.getBreed());
         assertEquals(Gender.SIRE, updated.getGender());
         assertEquals(dateTime, updated.getLastWalk());
+    }
+
+    @Test
+    @Order(3)
+    @Transactional
+    void testFindById_successfulFind(){
+        String ldt = "2021-08-03 15:40:00";
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime dateTime = LocalDateTime.parse(ldt, formatter);
+        Dog toSave = new Dog();
+        toSave.setLastWalk(dateTime);
+        toSave.setHasWaterAndFood(true);
+        toSave.setGender(Gender.SIRE);
+        toSave.setName("Diego");
+        toSave.setBreed("Maltese");
+        toSave.setAge(11);
+        toSave.setAdopted(false);
+        assertTrue(dogRepository.findAll().isEmpty());
+        dogRepository.save(toSave);
+        Dog found = dogRepository.findById(1);
+        assertEquals(1, dogRepository.findAll().size());
+        assertEquals(1, found.getId());
+        assertEquals(11, dogRepository.findById(found.getId()).getAge());
+        assertTrue(found.isHasWaterAndFood());
+        assertFalse(found.isAdopted());
+        assertEquals("Diego", dogRepository.findById(1).getName());
+        assertEquals("Maltese", found.getBreed());
+        assertEquals(Gender.SIRE, found.getGender());
+        assertEquals(dateTime, found.getLastWalk());
     }
 
 

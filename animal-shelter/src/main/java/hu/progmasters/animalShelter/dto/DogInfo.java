@@ -19,5 +19,5 @@ public class DogInfo {
     private Gender gender;
     private LocalDateTime lastWalk;
     private boolean hasWaterAndFood;
-    private boolean goneStray;
+    private boolean adopted;
 }

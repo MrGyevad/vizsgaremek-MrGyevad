@@ -30,12 +30,8 @@ public class AnimalService {
 
     public List<AnimalInfo> findAllAnimals(){
         List<Animal> animals = new ArrayList<>();
-        for (Dog dog : dogRepository.findAll()) {
-            animals.add((Animal) dog);
-        }
-        for (Cat cat : catRepository.findAll()){
-            animals.add((Animal) cat);
-        }
+        animals.addAll(dogRepository.findAll());
+        animals.addAll(catRepository.findAll());
         return animals.stream().map(animal -> modelMapper.map(animal, AnimalInfo.class)).collect(Collectors.toList());
     }
 }
