@@ -43,7 +43,7 @@ public class CatRepositoryTest {
     @Transactional
     void testUpdateDog_successfulUpdate(){
         cat1 = new Cat(1, "Lucifer", 10, "Giant", Gender.TOM, LocalDateTime.now(), true, false, new BestFriend(1, null, null));
-        cat2 = new Cat(1, "Retek", 4, "Fungusnail", Gender.SIRE, LocalDateTime.now(), true, false, new BestFriend(2, null, null));
+        cat2 = new Cat(1, "Ribizli", 5, "Halfear", Gender.PUSSY, LocalDateTime.now(), true, false, new BestFriend(2, null, null));
         LocalDateTime cat2LastPlay = cat2.getLastPlay();
         catRepository.save(cat1);
         Cat updated = catRepository.update(cat2);
@@ -94,7 +94,7 @@ public class CatRepositoryTest {
     @Transactional
     void testFindAll_allFound(){
         cat1 = new Cat(1, "Lucifer", 10, "Giant", Gender.TOM, LocalDateTime.now(), true, false, new BestFriend(1, null, null));
-        cat2 = new Cat(2, "Retek", 4, "Fungusnail", Gender.SIRE, LocalDateTime.now(), true, false, new BestFriend(2, null, null));
+        cat2 = new Cat(2, "Ribizli", 5, "Halfear", Gender.PUSSY, LocalDateTime.now(), true, false, new BestFriend(2, null, null));
         cat3 = new Cat(3, "Nudli", 0, "Mix", Gender.TOM, LocalDateTime.now(), true, false, new BestFriend(3, null, null));
         catRepository.save(cat1);
         assertEquals(1, catRepository.findAll().size());
@@ -109,7 +109,7 @@ public class CatRepositoryTest {
     @Transactional
     void testFindAllByGender_allFound(){
         cat1 = new Cat(1, "Lucifer", 10, "Giant", Gender.TOM, LocalDateTime.now(), true, false, new BestFriend(1, null, null));
-        cat2 = new Cat(2, "Retek", 4, "Fungusnail", Gender.PUSSY, LocalDateTime.now(), true, false, new BestFriend(2, null, null));
+        cat2 = new Cat(2, "Ribizli", 5, "Halfear", Gender.PUSSY, LocalDateTime.now(), true, false, new BestFriend(2, null, null));
         cat3 = new Cat(3, "Nudli", 0, "Mix", Gender.TOM, LocalDateTime.now(), true, false, new BestFriend(3, null, null));
         catRepository.save(cat1);
         catRepository.save(cat2);
