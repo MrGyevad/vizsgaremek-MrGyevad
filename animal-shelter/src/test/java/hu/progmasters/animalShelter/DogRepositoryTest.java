@@ -105,11 +105,56 @@ public class DogRepositoryTest {
         assertEquals(Gender.SIRE, found.getGender());
         assertEquals(dateTime, found.getLastWalk());
     }
-
-
-
-
-
-
-
-}
+    
+    @Test
+    @Order(4)
+    @Transactional
+    void testDelete_successfulDelete(){
+        Dog toDelete = new Dog(1, "Sirion", 6, "Mudi", Gender.SIRE, LocalDateTime.now(), true, false, new BestFriend(1, null, null));
+        dogRepository.save(toDelete);
+        assertEquals(1, dogRepository.findAll().size());
+        dogRepository.delete(toDelete);
+        assertEquals(0, dogRepository.findAll().size());
+    }
+    
+    @Test
+    @Order(5)
+    @Transactional
+    void testFindAll_allFound(){
+        dog1 = new Dog(1, "Sirion", 6, "Mudi", Gender.SIRE, LocalDateTime.now(), true, false, new BestFriend(1, null, null));
+        dog2 = new Dog(2, "Diego", 11, "Maltese", Gender.SIRE, LocalDateTime.now(), true, false, new BestFriend(2, null, null));
+        dog3 = new Dog(3, "Réka", 15, "Vizsla", Gender.BITCH, LocalDateTime.now(), true, false, new BestFriend(3, null, null));
+        dogRepository.save(dog1);
+        assertEquals(1, dogRepository.findAll().size());
+        dogRepository.save(dog2);
+        assertEquals(2, dogRepository.findAll().size());
+        dogRepository.save(dog3);
+        assertEquals(3, dogRepository.findAll().size());
+    }
+    
+    @Test
+    @Order(6)
+    @Transactional
+    void testFindAllByGender_allFound(){
+        dog1 = new Dog(1, "Sirion", 6, "Mudi", Gender.SIRE, LocalDateTime.now(), true, false, new BestFriend(1, null, null));
+        dog2 = new Dog(2, "Diego", 11, "Maltese", Gender.SIRE, LocalDateTime.now(), true, false, new BestFriend(2, null, null));
+        dog3 = new Dog(3, "Réka", 15, "Vizsla", Gender.BITCH, LocalDateTime.now(), true, false, new BestFriend(3, null, null));
+        dogRepository.save(dog1);
+        dogRepository.save(dog2);
+        dogRepository.save(dog3);
+        assertEquals(1, dogRepository.findAllByGender(Gender.BITCH).size());
+        assertEquals(2, dogRepository.findAllByGender(Gender.SIRE).size());
+    }
+    
+    @Test
+    @Order(7)
+    @Transactional
+    void testWalkMeBoy_dogWalked(){
+        dog1 = new Dog(1, "Sirion", 6, "Mudi", Gender.SIRE, LocalDateTime.now(), true, false, new BestFriend(1, null, null));
+        dogRepository.save(dog1);
+        LocalDateTime originalTime = dog1.getLastWalk();
+        assertEquals(originalTime, dogRepository.findById(1).getLastWalk());
+        dogRepository.walkMeBoy(1);
+        assertNotEquals(originalTime, dogRepository.findById(1).getLastWalk());
+    }
+ }
