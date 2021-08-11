@@ -9,6 +9,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class DogRepository {
@@ -17,25 +18,27 @@ public class DogRepository {
     private EntityManager entityManager;
 
     public Dog save(Dog toSave){
-        entityManager.persist(toSave);
-        return toSave;
+        return entityManager.merge(toSave);
+
     }
 
     public Dog update(Dog toUpdate){
         return entityManager.merge(toUpdate);
     }
 
-    public Dog findById(Integer id){
-        return entityManager.find(Dog.class, id);
+    public Optional<Dog> findById(Integer id){
+        return Optional.of(entityManager.find(Dog.class, id));
     }
 
-    public void delete(Dog toDelete){
-        toDelete.setAdopted(true);
-        entityManager.remove(toDelete);
+    public void delete(Optional<Dog> toDelete){
+        toDelete.ifPresent(dog -> dog.setAdopted(true));
+        toDelete.ifPresent(dog -> entityManager.remove(entityManager.contains(dog) ? dog : entityManager.merge(dog)));
     }
 
     public List<Dog> findAll(){
-        return entityManager.createQuery("SELECT d FROM Dog d", Dog.class).getResultList();
+        return entityManager.createQuery("SELECT d FROM Dog d WHERE d.adopted IN :value", Dog.class)
+                .setParameter("value", false)
+                .getResultList();
     }
 
     public List<Dog> findAllByGender(Gender gender){

@@ -19,6 +19,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -45,8 +46,9 @@ public class DogService {
     }
 
     public DogInfo updateDog(Integer id, DogCommand command){
-        Dog toUpdate = dogRepository.findById(id);
-        if (toUpdate != null) {
+        Dog toUpdate;
+        if (dogRepository.findById(id).isPresent()){
+        toUpdate = dogRepository.findById(id).get();
             toUpdate.setAge(command.getAge());
             toUpdate.setBreed(command.getBreed());
             toUpdate.setName(command.getName());
@@ -61,11 +63,9 @@ public class DogService {
     }
 
     public List<DogInfo> findAllDogs(){
-        return dogRepository.createQuery("SELECT d FROM Dog d WHERE d.isAdopted LIKE :value, Dog.class)
-                                         .setParameter("value", false)
-                                         .getResultList()
-                                         .stream()
-                                         .map(dog -> modelMapper.map(dog, DogInfo.class)).collect(Collectors.toList());
+        return dogRepository.findAll()
+                .stream()
+                .map(dog -> modelMapper.map(dog, DogInfo.class)).collect(Collectors.toList());
         /*
         List<Dog> dogs = dogRepository.findAll();
         return dogs.stream().map(dog -> modelMapper.map(dog, DogInfo.class)).collect(Collectors.toList());
@@ -88,22 +88,19 @@ public class DogService {
     }
 
     public void dogAdopted(Integer id){
-        Dog toAdopt = dogRepository.findById(id);
-        Cat bestFriend = new Cat();
+        Dog toAdopt = dogRepository.findById(id).get();
+        Cat bestFriend;
         try {
-            bestFriend = toAdopt.getBestFriendId().getCat();
+            bestFriend = toAdopt.getBestFriend().getCat();
         bestFriend.setAdopted(true);
-        catRepository.delete(bestFriend);
         } catch (CatNotFoundException e){
             e.printStackTrace();
         }
         toAdopt.setAdopted(true);
-        bestFriendRepository.saveAdoptedDog(toAdopt, bestFriend);
-        dogRepository.delete(toAdopt);
     }
 
     public void dogDeceased(Integer id){
-        Dog toDelete = dogRepository.findById(id);
+        Optional<Dog> toDelete = dogRepository.findById(id);
         dogRepository.delete(toDelete);
     }
 
@@ -111,7 +108,7 @@ public class DogService {
         List<Dog> allDogs = dogRepository.findAll();
         List<Dog> needWalk = new ArrayList<>();
         for (Dog dog : allDogs) {
-            long hours = ChronoUnit.HOURS.between(LocalDateTime.now(), dog.getLastWalk());
+            long hours = ChronoUnit.HOURS.between(dog.getLastWalk(), LocalDateTime.now());
             if (hours > 6){
                 needWalk.add(dog);
             }
@@ -137,7 +134,7 @@ public class DogService {
     public CatInfo findBestFriend(Integer id){
         CatInfo bestFriend = new CatInfo();
         try {
-            bestFriend = modelMapper.map(dogRepository.findById(id).getBestFriendId().getCat(), CatInfo.class);
+            bestFriend = modelMapper.map(dogRepository.findById(id).get().getBestFriend().getCat(), CatInfo.class);
         } catch (CatNotFoundException e){
             e.printStackTrace();
         }

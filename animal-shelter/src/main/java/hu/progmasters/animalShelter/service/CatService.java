@@ -7,6 +7,7 @@ import hu.progmasters.animalShelter.dto.CatCommand;
 import hu.progmasters.animalShelter.dto.CatInfo;
 import hu.progmasters.animalShelter.dto.DogInfo;
 import hu.progmasters.animalShelter.exception.CatNotFoundException;
+import hu.progmasters.animalShelter.exception.DogNotFoundException;
 import hu.progmasters.animalShelter.repository.CatRepository;
 import hu.progmasters.animalShelter.repository.BestFriendRepository;
 import hu.progmasters.animalShelter.repository.DogRepository;
@@ -18,6 +19,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,14 +38,14 @@ public class CatService {
         this.modelMapper = modelMapper;
     }
 
-    public CatInfo saveCat(CatCommand command){
+    public CatInfo saveCat(CatCommand command) {
         Cat toSave = modelMapper.map(command, Cat.class);
         Cat saved = catRepository.save(toSave);
         return modelMapper.map(saved, CatInfo.class);
     }
 
-    public CatInfo updateCat(Integer id, CatCommand command){
-        Cat toUpdate = catRepository.findById(id);
+    public CatInfo updateCat(Integer id, CatCommand command) {
+        Cat toUpdate = catRepository.findById(id).get();
         if (toUpdate != null) {
             toUpdate.setAge(command.getAge());
             toUpdate.setBreed(command.getBreed());
@@ -59,67 +61,69 @@ public class CatService {
         return modelMapper.map(updated, CatInfo.class);
     }
 
-    public List<CatInfo> findAllCats(){
+    public List<CatInfo> findAllCats() {
         List<Cat> cats = catRepository.findAll();
         return cats.stream().map(cat -> modelMapper.map(cat, CatInfo.class)).collect(Collectors.toList());
     }
 
-    public CatInfo findById(Integer id){
-        Cat found = catRepository.findById(id);
-        if (found != null){
+    public CatInfo findById(Integer id) {
+        Cat found = catRepository.findById(id).get();
+        if (catRepository.findById(id).isPresent()) {
             return modelMapper.map(found, CatInfo.class);
         } else {
             throw new CatNotFoundException();
         }
     }
 
-    public List<CatInfo> findAllByGender(Gender gender){
+    public List<CatInfo> findAllByGender(Gender gender) {
         List<Cat> foundByGender = catRepository.findAllByGender(gender);
         return foundByGender.stream().map(cat -> modelMapper.map(cat, CatInfo.class)).collect(Collectors.toList());
     }
 
-    public void catAdopted(Integer id){
-        Cat toAdopt = catRepository.findById(id);
-        Dog bestFriend = toAdopt.getBestFriendId().getDog();
+    public void catAdopted(Integer id) {
+        Cat toAdopt = catRepository.findById(id).get();
+        Dog bestFriend;
+        try {
+            bestFriend = toAdopt.getBestFriend().getDog();
+            bestFriend.setAdopted(true);
+        } catch (DogNotFoundException e){
+            e.printStackTrace();
+        }
         toAdopt.setAdopted(true);
-        bestFriend.setAdopted(true);
-        bestFriendRepository.saveAdoptedCat(toAdopt, bestFriend);
-        catRepository.delete(toAdopt);
-        dogRepository.delete(bestFriend);
     }
 
-    public void catDeceased(Integer id){
-        Cat toDelete = catRepository.findById(id);
+    public void catDeceased(Integer id) {
+        Optional<Cat> toDelete = catRepository.findById(id);
         catRepository.delete(toDelete);
     }
 
-    public List<CatInfo> whoNeedsToPlay(){
+    public List<CatInfo> whoNeedsToPlay() {
         List<Cat> allCats = catRepository.findAll();
         List<Cat> needToPlay = new ArrayList<>();
         for (Cat cat : allCats) {
             long hours = ChronoUnit.HOURS.between(LocalDateTime.now(), cat.getLastPlay());
-            if (hours > 6){
+            if (hours > 6) {
                 needToPlay.add(cat);
             }
         }
         return needToPlay.stream().map(cat -> modelMapper.map(cat, CatInfo.class)).collect(Collectors.toList());
     }
 
-    public CatInfo playWithCat(Integer id){
+    public CatInfo playWithCat(Integer id) {
         Cat played = catRepository.playWithMeGirl(id);
         return modelMapper.map(played, CatInfo.class);
     }
 
-    public void playWithAllCats(){
+    public void playWithAllCats() {
         for (Cat cat : catRepository.findAll()) {
             long hours = ChronoUnit.HOURS.between(LocalDateTime.now(), cat.getLastPlay());
-            if (hours > 6){
+            if (hours > 6) {
                 cat.setLastPlay(LocalDateTime.now());
             }
         }
     }
 
     public DogInfo findBestFriend(Integer id) {
-        return modelMapper.map(catRepository.findById(id).getBestFriendId().getDog(), DogInfo.class);
+        return modelMapper.map(catRepository.findById(id).get().getBestFriend().getDog(), DogInfo.class);
     }
 }

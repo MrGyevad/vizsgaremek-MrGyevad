@@ -27,6 +27,6 @@ public class Cat extends Animal{
     private LocalDateTime lastPlay;
     private boolean hasWaterAndFood;
     private boolean adopted;
-    @OneToOne(mappedBy = "cat")
-    private BestFriend bestFriendId;
+    @OneToOne(mappedBy = "cat", cascade = CascadeType.ALL)
+    private BestFriend bestFriend;
 }

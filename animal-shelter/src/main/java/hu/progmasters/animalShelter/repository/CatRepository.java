@@ -8,6 +8,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class CatRepository {
@@ -16,30 +17,30 @@ public class CatRepository {
     private EntityManager entityManager;
 
     public Cat save(Cat toSave) {
-        entityManager.persist(toSave);
-        toSave.setId(toSave.getId()*2);
-        return toSave;
+        return entityManager.merge(toSave);
     }
 
     public Cat update(Cat toUpdate) {
         return entityManager.merge(toUpdate);
     }
 
-    public Cat findById(Integer id) {
-        return entityManager.find(Cat.class, id);
+    public Optional<Cat> findById(Integer id) {
+        return Optional.of(entityManager.find(Cat.class, id));
     }
 
-    public void delete(Cat toDelete) {
-        toDelete.setAdopted(true);
-        entityManager.remove(toDelete);
+    public void delete(Optional<Cat> toDelete) {
+        toDelete.ifPresent(cat -> cat.setAdopted(true));
+        toDelete.ifPresent(cat -> entityManager.remove(entityManager.contains(cat) ? cat : entityManager.merge(cat)));
     }
 
     public List<Cat> findAll() {
-        return entityManager.createQuery("SELECT d FROM Cat d", Cat.class).getResultList();
+        return entityManager.createQuery("SELECT c FROM Cat c WHERE c.adopted IN :value ", Cat.class)
+                .setParameter("value", false)
+                .getResultList();
     }
 
     public List<Cat> findAllByGender(Gender gender) {
-        return entityManager.createQuery("SELECT d FROM Cat d WHERE d.gender = :gender", Cat.class)
+        return entityManager.createQuery("SELECT c FROM Cat c WHERE c.gender = :gender", Cat.class)
                 .setParameter("gender", gender)
                 .getResultList();
     }
