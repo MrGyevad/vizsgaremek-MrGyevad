@@ -61,8 +61,15 @@ public class DogService {
     }
 
     public List<DogInfo> findAllDogs(){
+        return dogRepository.createQuery("SELECT d FROM Dog d WHERE d.isAdopted LIKE :value, Dog.class)
+                                         .setParameter("value", false)
+                                         .getResultList()
+                                         .stream()
+                                         .map(dog -> modelMapper.map(dog, DogInfo.class)).collect(Collectors.toList());
+        /*
         List<Dog> dogs = dogRepository.findAll();
         return dogs.stream().map(dog -> modelMapper.map(dog, DogInfo.class)).collect(Collectors.toList());
+    */
     }
 
     public DogInfo findById(Integer id){
