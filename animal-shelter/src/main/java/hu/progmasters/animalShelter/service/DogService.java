@@ -38,31 +38,31 @@ public class DogService {
         this.modelMapper = modelMapper;
     }
 
-    public DogInfo saveDog(DogCommand command){
+    public DogInfo saveDog(DogCommand command) {
         command.setLastWalk(LocalDateTime.now());
         Dog toSave = modelMapper.map(command, Dog.class);
         Dog saved = dogRepository.save(toSave);
         return modelMapper.map(saved, DogInfo.class);
     }
 
-    public DogInfo updateDog(Integer id, DogCommand command){
-        Dog toUpdate;
-        if (dogRepository.findById(id).isPresent()){
-        toUpdate = dogRepository.findById(id).get();
-            toUpdate.setAge(command.getAge());
-            toUpdate.setBreed(command.getBreed());
-            toUpdate.setName(command.getName());
-            toUpdate.setAdopted(command.isAdopted());
-            toUpdate.setGender(command.getGender());
-            toUpdate.setHasWaterAndFood(command.isHasWaterAndFood());
+    public DogInfo updateDog(Integer id, DogCommand command) {
+        Dog dogToUpdate;
+        if (dogRepository.findById(id).isPresent()) {
+            dogToUpdate = dogRepository.findById(id).get();
+            dogToUpdate.setAge(command.getAge());
+            dogToUpdate.setBreed(command.getBreed());
+            dogToUpdate.setName(command.getName());
+            dogToUpdate.setAdopted(command.isAdopted());
+            dogToUpdate.setGender(command.getGender());
+            dogToUpdate.setHasWaterAndFood(command.isHasWaterAndFood());
         } else {
             throw new DogNotFoundException();
         }
-        Dog updated = dogRepository.update(toUpdate);
+        Dog updated = dogRepository.update(dogToUpdate);
         return modelMapper.map(updated, DogInfo.class);
     }
 
-    public List<DogInfo> findAllDogs(){
+    public List<DogInfo> findAllDogs() {
         return dogRepository.findAll()
                 .stream()
                 .map(dog -> modelMapper.map(dog, DogInfo.class)).collect(Collectors.toList());
@@ -72,51 +72,51 @@ public class DogService {
     */
     }
 
-    public DogInfo findById(Integer id){
+    public DogInfo findById(Integer id) {
         DogInfo found = new DogInfo();
         try {
             found = modelMapper.map(dogRepository.findById(id), DogInfo.class);
-        } catch (DogNotFoundException e){
+        } catch (DogNotFoundException e) {
             e.printStackTrace();
         }
         return found;
     }
 
-    public List<DogInfo> findAllByGender(Gender gender){
+    public List<DogInfo> findAllByGender(Gender gender) {
         List<Dog> foundByGender = dogRepository.findAllByGender(gender);
         return foundByGender.stream().map(dog -> modelMapper.map(dog, DogInfo.class)).collect(Collectors.toList());
     }
 
-    public void dogAdopted(Integer id){
+    public void dogAdopted(Integer id) {
         Dog toAdopt = dogRepository.findById(id).get();
         Cat bestFriend;
         try {
             bestFriend = toAdopt.getBestFriend().getCat();
-        bestFriend.setAdopted(true);
-        } catch (CatNotFoundException e){
+            bestFriend.setAdopted(true);
+        } catch (CatNotFoundException e) {
             e.printStackTrace();
         }
         toAdopt.setAdopted(true);
     }
 
-    public void dogDeceased(Integer id){
+    public void dogDeceased(Integer id) {
         Optional<Dog> toDelete = dogRepository.findById(id);
         dogRepository.delete(toDelete);
     }
 
-    public List<DogInfo> whoNeedsAWalk(){
+    public List<DogInfo> whoNeedsAWalk() {
         List<Dog> allDogs = dogRepository.findAll();
         List<Dog> needWalk = new ArrayList<>();
         for (Dog dog : allDogs) {
             long hours = ChronoUnit.HOURS.between(dog.getLastWalk(), LocalDateTime.now());
-            if (hours > 6){
+            if (hours > 6) {
                 needWalk.add(dog);
             }
         }
         return needWalk.stream().map(dog -> modelMapper.map(dog, DogInfo.class)).collect(Collectors.toList());
     }
 
-    public DogInfo walkTheDog(Integer id){
+    public DogInfo walkTheDog(Integer id) {
         Dog dog = dogRepository.walkMeBoy(id);
         return modelMapper.map(dog, DogInfo.class);
     }
@@ -124,18 +124,18 @@ public class DogService {
 
     public void walkAllDogs() {
         for (Dog dog : dogRepository.findAll()) {
-            long hours = ChronoUnit.HOURS.between(LocalDateTime.now(), dog.getLastWalk());
-            if (hours > 6){
+            long hours = ChronoUnit.HOURS.between(dog.getLastWalk(), LocalDateTime.now());
+            if (hours > 6) {
                 dog.setLastWalk(LocalDateTime.now());
             }
         }
     }
 
-    public CatInfo findBestFriend(Integer id){
+    public CatInfo findBestFriend(Integer id) {
         CatInfo bestFriend = new CatInfo();
         try {
             bestFriend = modelMapper.map(dogRepository.findById(id).get().getBestFriend().getCat(), CatInfo.class);
-        } catch (CatNotFoundException e){
+        } catch (CatNotFoundException e) {
             e.printStackTrace();
         }
         return bestFriend;

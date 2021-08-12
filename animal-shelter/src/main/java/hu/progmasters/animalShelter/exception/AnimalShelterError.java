@@ -1,13 +1,13 @@
 package hu.progmasters.animalShelter.exception;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Getter
-@AllArgsConstructor
+@Data
 @NoArgsConstructor
-public class DogNotFoundException extends RuntimeException {
+@AllArgsConstructor
+public class AnimalShelterError {
     private String field;
-    private Integer idOfNotFound;
+    private String message;
 }

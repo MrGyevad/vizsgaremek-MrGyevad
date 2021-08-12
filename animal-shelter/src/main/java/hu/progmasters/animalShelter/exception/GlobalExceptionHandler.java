@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -29,16 +30,17 @@ public class GlobalExceptionHandler {
                 .collect(Collectors.toList());
         return new ResponseEntity<>(notLegitTimeExceptions, HttpStatus.BAD_REQUEST);
     }
+*/
+    @ExceptionHandler(DogNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public List<AnimalShelterError> handleDogNotFoundException(DogNotFoundException exception){
+        AnimalShelterError error = new AnimalShelterError();
+        error.setField(exception.getField());
+        error.setMessage(exception.getMessage());
+        return List.of(error);
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<List<DogNotFoundException>> handleDogNotFoundException(MethodArgumentNotValidException exception){
-        List<DogNotFoundException> dogNotFoundExceptions = exception.getBindingResult().getFieldErrors()
-                .stream()
-                .map(fieldError -> new DogNotFoundException(fieldError.getField(), fieldError.getDefaultMessage()))
-                .collect(Collectors.toList());
-        return new ResponseEntity<>(dogNotFoundExceptions, HttpStatus.NOT_FOUND);
     }
-
+/*
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<List<CatNotFoundException>> handleCatNotFoundException(MethodArgumentNotValidException exception){
         List<CatNotFoundException> catNotFoundExceptions = exception.getBindingResult().getFieldErrors()

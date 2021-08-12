@@ -29,7 +29,7 @@ public class CatService {
     private final CatRepository catRepository;
     private final DogRepository dogRepository;
     private final BestFriendRepository bestFriendRepository;
-    private final ModelMapper modelMapper;
+    private ModelMapper modelMapper;
 
     public CatService(CatRepository catRepository, DogRepository dogRepository, BestFriendRepository bestFriendRepository, ModelMapper modelMapper) {
         this.catRepository = catRepository;
@@ -39,14 +39,16 @@ public class CatService {
     }
 
     public CatInfo saveCat(CatCommand command) {
+        command.setLastPlay(LocalDateTime.now());
         Cat toSave = modelMapper.map(command, Cat.class);
         Cat saved = catRepository.save(toSave);
         return modelMapper.map(saved, CatInfo.class);
     }
 
     public CatInfo updateCat(Integer id, CatCommand command) {
-        Cat toUpdate = catRepository.findById(id).get();
-        if (toUpdate != null) {
+        Cat toUpdate;
+        if (catRepository.findById(id).isPresent()) {
+            toUpdate = catRepository.findById(id).get();
             toUpdate.setAge(command.getAge());
             toUpdate.setBreed(command.getBreed());
             toUpdate.setName(command.getName());
@@ -86,7 +88,7 @@ public class CatService {
         try {
             bestFriend = toAdopt.getBestFriend().getDog();
             bestFriend.setAdopted(true);
-        } catch (DogNotFoundException e){
+        } catch (DogNotFoundException e) {
             e.printStackTrace();
         }
         toAdopt.setAdopted(true);
@@ -101,7 +103,7 @@ public class CatService {
         List<Cat> allCats = catRepository.findAll();
         List<Cat> needToPlay = new ArrayList<>();
         for (Cat cat : allCats) {
-            long hours = ChronoUnit.HOURS.between(LocalDateTime.now(), cat.getLastPlay());
+            long hours = ChronoUnit.HOURS.between(cat.getLastPlay(), LocalDateTime.now());
             if (hours > 6) {
                 needToPlay.add(cat);
             }
@@ -116,7 +118,7 @@ public class CatService {
 
     public void playWithAllCats() {
         for (Cat cat : catRepository.findAll()) {
-            long hours = ChronoUnit.HOURS.between(LocalDateTime.now(), cat.getLastPlay());
+            long hours = ChronoUnit.HOURS.between(cat.getLastPlay(), LocalDateTime.now());
             if (hours > 6) {
                 cat.setLastPlay(LocalDateTime.now());
             }
