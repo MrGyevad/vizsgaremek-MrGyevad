@@ -8,6 +8,7 @@ import hu.progmasters.animalShelter.dto.*;
 import hu.progmasters.animalShelter.repository.BestFriendRepository;
 import hu.progmasters.animalShelter.repository.CatRepository;
 import hu.progmasters.animalShelter.repository.DogRepository;
+import hu.progmasters.animalShelter.service.DogService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
@@ -19,6 +20,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -49,6 +51,9 @@ public class AnimalShelterControllerIntegrationTest {
     @Autowired
     ModelMapper modelMapper;
 
+    @Autowired
+    DogService dogService;
+
     private static DogCommand dogCommand1;
     private static DogInfo dogInfo1;
     private static CatCommand catCommand1;
@@ -61,32 +66,41 @@ public class AnimalShelterControllerIntegrationTest {
     private static BestFriendInfo bestFriendInfo2;
     private static DogCommand updateDogCommand1;
     private static CatCommand updateCatCommand1;
-    
+    private static AnimalInfo animalInfoDog1;
+    private static AnimalInfo animalInfoCat1;
+
     @BeforeEach
     void init(){
         ModelMapper modelMapper = new ModelMapper();
-        dogCommand1 = new DogCommand("Sirion", 6, "Mudi", Gender.SIRE, LocalDateTime.now(),
+        String ldt = "2021-08-13 15:40:00";
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime dateTime = LocalDateTime.parse(ldt, formatter);
+        dogCommand1 = new DogCommand("Sirion", 6, "Mudi", Gender.SIRE, dateTime,
                 true, false);
-        dogInfo1 = new DogInfo(1, "Sirion", 6, "Mudi", Gender.SIRE, LocalDateTime.now(),
+        dogInfo1 = new DogInfo(1, "Sirion", 6, "Mudi", Gender.SIRE, dateTime,
                 true, false);
-        dogCommand2 = new DogCommand("Diego", 11, "Maltese", Gender.SIRE, LocalDateTime.now(),
+        dogCommand2 = new DogCommand("Diego", 11, "Maltese", Gender.SIRE, dateTime,
                 true, false);
-        dogInfo2 = new DogInfo(2, "Diego", 11, "Maltese", Gender.SIRE, LocalDateTime.now(),
+        dogInfo2 = new DogInfo(2, "Diego", 11, "Maltese", Gender.SIRE, dateTime,
                 true, false);
         catCommand1 = new CatCommand("Lucifer", 10, "Giant", Gender.TOM,
-                LocalDateTime.now(), true, false);
+                dateTime, true, false);
         catInfo1 = new CatInfo(1, "Lucifer", 10, "Giant", Gender.TOM,
-                LocalDateTime.now(), true, false);
+                dateTime, true, false);
         catCommand2 = new CatCommand("Ribizli", 5, "Halfear", Gender.PUSSY,
-                LocalDateTime.now(), true, false);
+                dateTime, true, false);
         catInfo2 = new CatInfo(2, "Ribizli", 5, "Halfear", Gender.PUSSY,
-                LocalDateTime.now(), true, false);
+                dateTime, true, false);
         bestFriendInfo1 = new BestFriendInfo(1, catInfo1, dogInfo1);
         bestFriendInfo2 = new BestFriendInfo(2, catInfo2, dogInfo2);
-        updateDogCommand1 = new DogCommand("Réka", 15, "Vizsla", Gender.BITCH, LocalDateTime.now(),
+        updateDogCommand1 = new DogCommand("Réka", 15, "Vizsla", Gender.BITCH, dateTime,
                 true, false);
         updateCatCommand1 = new CatCommand("Retek", 4, "Ginger", Gender.TOM,
-                LocalDateTime.now(), true, false);
+                dateTime, true, false);
+        animalInfoDog1 = new AnimalInfo(1, "Sirion", 6, "Mudi", Gender.SIRE, dateTime,
+                true, false);
+        animalInfoCat1 = new AnimalInfo(1, "Lucifer", 10, "Giant", Gender.TOM,
+                dateTime, true, false);
     }
 
     @Test
@@ -104,11 +118,11 @@ public class AnimalShelterControllerIntegrationTest {
                 .andExpect(status().isCreated())
                 .andExpect(content().json(objectMapper.writeValueAsString(dogInfo1)));
 
-        assertThat(dogRepository.findAll()).hasSize(1).containsExactly(modelMapper.map(dogInfo1, Dog.class));
+        assertThat(dogService.findAllDogs()).hasSize(1).contains(dogInfo1);
 
         mockMvc.perform(get("/api/dog"))
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(dogInfo1)));
+                .andExpect(content().json(objectMapper.writeValueAsString(List.of(dogInfo1))));
 
     }
 
