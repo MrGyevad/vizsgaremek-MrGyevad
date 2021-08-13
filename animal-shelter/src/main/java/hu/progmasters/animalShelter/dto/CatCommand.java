@@ -1,5 +1,6 @@
 package hu.progmasters.animalShelter.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import hu.progmasters.animalShelter.domain.Gender;
 import hu.progmasters.animalShelter.validation.CatGender;
 import lombok.AllArgsConstructor;
@@ -26,6 +27,7 @@ public class CatCommand {
     @CatGender
     private Gender gender;
     @PastOrPresent
+    @JsonFormat(pattern = "yyyy-MM-dd@HH:mm:ss")
     private LocalDateTime lastPlay;
     private boolean hasWaterAndFood;
     private boolean adopted;

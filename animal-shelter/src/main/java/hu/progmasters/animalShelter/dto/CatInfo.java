@@ -1,5 +1,6 @@
 package hu.progmasters.animalShelter.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import hu.progmasters.animalShelter.domain.Gender;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -19,6 +20,7 @@ public class CatInfo {
     private int age;
     private String breed;
     private Gender gender;
+    @JsonFormat(pattern = "yyyy-MM-dd@HH:mm:ss")
     private LocalDateTime lastPlay;
     private boolean hasWaterAndFood;
     private boolean adopted;

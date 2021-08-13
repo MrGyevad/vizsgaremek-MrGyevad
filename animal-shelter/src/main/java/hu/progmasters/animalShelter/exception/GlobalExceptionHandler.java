@@ -20,42 +20,33 @@ public class GlobalExceptionHandler {
                 .map(fieldError -> new ValidationError(fieldError.getField(), fieldError.getDefaultMessage()))
                 .collect(Collectors.toList());
         return new ResponseEntity<>(validationErrors, HttpStatus.BAD_REQUEST);
-    }/*
-
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<List<NotLegitTimeException>> handleNotLegitTimeException(MethodArgumentNotValidException exception){
-        List<NotLegitTimeException> notLegitTimeExceptions = exception.getBindingResult().getFieldErrors()
-                .stream()
-                .map(fieldError -> new NotLegitTimeException(fieldError.getField(), fieldError.getDefaultMessage()))
-                .collect(Collectors.toList());
-        return new ResponseEntity<>(notLegitTimeExceptions, HttpStatus.BAD_REQUEST);
     }
-*/
+
     @ExceptionHandler(DogNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public List<AnimalShelterError> handleDogNotFoundException(DogNotFoundException exception){
         AnimalShelterError error = new AnimalShelterError();
-        error.setField(exception.getField());
         error.setMessage(exception.getMessage());
+        error.setIdOfNotFound(exception.getIdOfNotFound());
         return List.of(error);
 
     }
-/*
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<List<CatNotFoundException>> handleCatNotFoundException(MethodArgumentNotValidException exception){
-        List<CatNotFoundException> catNotFoundExceptions = exception.getBindingResult().getFieldErrors()
-                .stream()
-                .map(fieldError -> new CatNotFoundException(fieldError.getField(), fieldError.getDefaultMessage()))
-                .collect(Collectors.toList());
-        return new ResponseEntity<>(catNotFoundExceptions, HttpStatus.NOT_FOUND);
+
+    @ExceptionHandler(CatNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public List<AnimalShelterError> handleCatNotFoundException(CatNotFoundException exception){
+        AnimalShelterError error = new AnimalShelterError();
+        error.setMessage(exception.getMessage());
+        error.setIdOfNotFound(exception.getIdOfNotFound());
+        return List.of(error);
     }
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<List<NoBestFriendException>> handleNoBestFriendException(MethodArgumentNotValidException exception){
-        List<NoBestFriendException> noBestFriendExceptions = exception.getBindingResult().getFieldErrors()
-                .stream()
-                .map(fieldError -> new NoBestFriendException(fieldError.getField(), fieldError.getDefaultMessage()))
-                .collect(Collectors.toList());
-        return new ResponseEntity<>(noBestFriendExceptions, HttpStatus.NOT_FOUND);
-    }*/
+    @ExceptionHandler(NoBestFriendException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public List<AnimalShelterError> handleNoBestFriendException(NoBestFriendException exception){
+        AnimalShelterError error = new AnimalShelterError();
+        error.setMessage(exception.getMessage());
+        error.setIdOfNotFound(exception.getIdOfLoneAnimal());
+        return List.of(error);
+    }
 }

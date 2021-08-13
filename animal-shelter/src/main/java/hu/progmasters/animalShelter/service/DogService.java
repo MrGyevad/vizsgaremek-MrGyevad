@@ -11,6 +11,7 @@ import hu.progmasters.animalShelter.exception.DogNotFoundException;
 import hu.progmasters.animalShelter.repository.CatRepository;
 import hu.progmasters.animalShelter.repository.DogRepository;
 import hu.progmasters.animalShelter.repository.BestFriendRepository;
+import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
@@ -39,7 +40,6 @@ public class DogService {
     }
 
     public DogInfo saveDog(DogCommand command) {
-        command.setLastWalk(LocalDateTime.now());
         Dog toSave = modelMapper.map(command, Dog.class);
         Dog saved = dogRepository.save(toSave);
         return modelMapper.map(saved, DogInfo.class);
@@ -66,20 +66,15 @@ public class DogService {
         return dogRepository.findAll()
                 .stream()
                 .map(dog -> modelMapper.map(dog, DogInfo.class)).collect(Collectors.toList());
-        /*
-        List<Dog> dogs = dogRepository.findAll();
-        return dogs.stream().map(dog -> modelMapper.map(dog, DogInfo.class)).collect(Collectors.toList());
-    */
     }
 
     public DogInfo findById(Integer id) {
-        DogInfo found = new DogInfo();
-        try {
-            found = modelMapper.map(dogRepository.findById(id), DogInfo.class);
-        } catch (DogNotFoundException e) {
-            e.printStackTrace();
+        Optional<Dog> found = dogRepository.findById(id);
+        if (found.isPresent()){
+            return modelMapper.map(found.get(), DogInfo.class);
+        } else {
+            throw new DogNotFoundException();
         }
-        return found;
     }
 
     public List<DogInfo> findAllByGender(Gender gender) {
@@ -132,12 +127,10 @@ public class DogService {
     }
 
     public CatInfo findBestFriend(Integer id) {
-        CatInfo bestFriend = new CatInfo();
-        try {
-            bestFriend = modelMapper.map(dogRepository.findById(id).get().getBestFriend().getCat(), CatInfo.class);
-        } catch (CatNotFoundException e) {
-            e.printStackTrace();
-        }
-        return bestFriend;
+        Optional<Dog> found = dogRepository.findById(id);
+        if (found.isPresent()){
+            return modelMapper.map(found.get().getBestFriend().getCat(), CatInfo.class);
+        } else throw new DogNotFoundException();
+
     }
 }

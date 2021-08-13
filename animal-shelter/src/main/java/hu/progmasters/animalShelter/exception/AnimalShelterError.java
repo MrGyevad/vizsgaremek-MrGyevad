@@ -10,4 +10,5 @@ import lombok.NoArgsConstructor;
 public class AnimalShelterError {
     private String field;
     private String message;
+    private Integer idOfNotFound;
 }
