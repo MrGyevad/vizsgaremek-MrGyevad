@@ -66,7 +66,22 @@ public class AnimalShelterController {
         List<DogInfo> dogInfoList;
         log.info("HTTP GET /api/dog - List all dogs");
         dogInfoList = dogService.findAllDogs();
-        log.info(String.format("HTTP Response: FOUND, Body: %s", dogInfoList));
+        log.info(String.format("HTTP Response: OK, Body: %s", dogInfoList));
+        return dogInfoList;
+    }
+
+    @Operation(summary = "Find all adopted dogs")
+    @ApiResponse(responseCode = "200",
+            description = "List all dogs who once lived in the shelter",
+            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                    array = @ArraySchema(schema = @Schema(implementation = DogInfo.class))))
+    @GetMapping("/dog/adopt")
+    @ResponseStatus(HttpStatus.OK)
+    public List<DogInfo> findAllAdoptedDogs() {
+        List<DogInfo> dogInfoList;
+        log.info("HTTP GET /api/dog - List all adopted dogs");
+        dogInfoList = dogService.findAllAdoptedDogs();
+        log.info(String.format("HTTP Response: OK, Body: %s", dogInfoList));
         return dogInfoList;
     }
 
@@ -101,7 +116,7 @@ public class AnimalShelterController {
                 content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
                         array = @ArraySchema(schema = @Schema(implementation = AnimalShelterError.class))))})
     @GetMapping("/dog/{id}")
-    @ResponseStatus(HttpStatus.FOUND)
+    @ResponseStatus(HttpStatus.OK)
     public DogInfo findDogById(@PathVariable("id") Integer id) {
         log.info(String.format("HTTP GET /api/dog/%s - Find dog by ID", id));
         DogInfo found = dogService.findById(id);
@@ -131,12 +146,7 @@ public class AnimalShelterController {
     @ResponseStatus(HttpStatus.OK)
     public DogInfo updateDog(@PathVariable("id") Integer id, @Valid @RequestBody DogCommand command) {
         log.info(String.format("HTTP PUT /api/dog/%s - Update dog", id));
-        DogInfo updated = new DogInfo();
-        try {
-            updated = dogService.updateDog(id, command);
-        } catch (DogNotFoundException e) {
-            e.printStackTrace();
-        }
+        DogInfo updated = dogService.updateDog(id, command);
         log.info("HTTP Response: OK, Dog updated.");
         return updated;
     }
@@ -243,7 +253,7 @@ public class AnimalShelterController {
                     description = "Dog not found, or has no best friend",
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
                     schema = @Schema(implementation = AnimalShelterError.class)))})
-    @GetMapping("/dog/bestfriend/{id}")
+    @GetMapping("/dog/bestFriend/{id}")
     @ResponseStatus(HttpStatus.OK)
     public CatInfo findDogsBestFriend(@PathVariable("id") Integer id) {
         CatInfo bestFriend = new CatInfo();
@@ -444,11 +454,27 @@ public class AnimalShelterController {
     @GetMapping("/cat/bestfriend/{id}")
     @ResponseStatus(HttpStatus.OK)
     public DogInfo findCatsBestFriend(@PathVariable("id") Integer id) {
-        log.info("HTTP GET /api/cat/bestfriend - Find cat's best friend");
-        String catName = catService.findById(id).getName();
         DogInfo bestFriend = catService.findBestFriend(id);
+        log.info(String.format("HTTP GET /api/cat/bestfriend/%s - Find cat's best friend", id));
+        String catName = catService.findById(id).getName();
+        try {
+            bestFriend = catService.findBestFriend(id);
+        } catch (DogNotFoundException e) {
+            e.printStackTrace();
+        }
         log.info(String.format("HTTP Response OK, The best friend of %s is %s", catName, bestFriend));
         return bestFriend;
+    }
+
+
+    @PutMapping("/{catId}/{dogId}")
+    @ResponseStatus(HttpStatus.OK)
+    public BestFriendInfo becomeBestFriends(@PathVariable("catId") Integer catId, @PathVariable("dogId") Integer dogId){
+        log.info(String.format("HTTP PUT /api/%s/%s - Cat and dog become best friends", catId, dogId));
+        BestFriendInfo bestFriendInfo = animalService.becomeBestFriends(catId, dogId);
+        log.info(String.format("HTTP Response OK, Cat with ID: %s, and dog with ID: %s became best friends.", catId, dogId));
+        return bestFriendInfo;
+
     }
 
 }

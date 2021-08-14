@@ -19,7 +19,6 @@ public class DogRepository {
 
     public Dog save(Dog toSave){
         return entityManager.merge(toSave);
-
     }
 
     public Dog update(Dog toUpdate){
@@ -27,12 +26,15 @@ public class DogRepository {
     }
 
     public Optional<Dog> findById(Integer id){
-        return Optional.of(entityManager.find(Dog.class, id));
+        if (entityManager.find(Dog.class, id) != null){
+            return Optional.of(entityManager.find(Dog.class, id));
+        } else {
+            return Optional.empty();
+        }
     }
 
-    public void delete(Optional<Dog> toDelete){
-        toDelete.ifPresent(dog -> dog.setAdopted(true));
-        toDelete.ifPresent(dog -> entityManager.remove(entityManager.contains(dog) ? dog : entityManager.merge(dog)));
+    public void dogDeceased(Dog toDelete){
+        entityManager.remove(entityManager.contains(toDelete) ? toDelete : entityManager.merge(toDelete));
     }
 
     public List<Dog> findAll(){
@@ -48,8 +50,19 @@ public class DogRepository {
     }
 
     public Dog walkMeBoy(Integer id){
-        Dog walked = entityManager.find(Dog.class, id);
-        walked.setLastWalk(LocalDateTime.now());
-        return walked;
+        if (entityManager.find(Dog.class, id) != null) {
+            Optional<Dog> dogOptional = Optional.of(entityManager.find(Dog.class, id));
+            Dog walked = dogOptional.get();
+            walked.setLastWalk(LocalDateTime.now());
+            return entityManager.merge(walked);
+        } else {
+            return null;
+        }
+    }
+
+    public List<Dog> findAllAdopted(){
+        return entityManager.createQuery("SELECT d FROM Dog d WHERE d.adopted IN :value", Dog.class)
+                .setParameter("value", true)
+                .getResultList();
     }
 }

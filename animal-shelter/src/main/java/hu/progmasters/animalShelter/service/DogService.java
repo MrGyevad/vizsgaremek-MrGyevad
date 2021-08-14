@@ -1,5 +1,6 @@
 package hu.progmasters.animalShelter.service;
 
+import hu.progmasters.animalShelter.domain.BestFriend;
 import hu.progmasters.animalShelter.domain.Cat;
 import hu.progmasters.animalShelter.domain.Dog;
 import hu.progmasters.animalShelter.domain.Gender;
@@ -8,10 +9,10 @@ import hu.progmasters.animalShelter.dto.DogCommand;
 import hu.progmasters.animalShelter.dto.DogInfo;
 import hu.progmasters.animalShelter.exception.CatNotFoundException;
 import hu.progmasters.animalShelter.exception.DogNotFoundException;
+import hu.progmasters.animalShelter.exception.NoBestFriendException;
 import hu.progmasters.animalShelter.repository.CatRepository;
 import hu.progmasters.animalShelter.repository.DogRepository;
 import hu.progmasters.animalShelter.repository.BestFriendRepository;
-import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
@@ -42,7 +43,21 @@ public class DogService {
     public DogInfo saveDog(DogCommand command) {
         Dog toSave = modelMapper.map(command, Dog.class);
         Dog saved = dogRepository.save(toSave);
-        return modelMapper.map(saved, DogInfo.class);
+        Dog updated;
+        BestFriend bestFriend;
+        if (bestFriendRepository.findFriendshipById(saved.getId()).isPresent()){
+            bestFriend = bestFriendRepository.findFriendshipById(toSave.getId()).get();
+            saved.setBestFriend(bestFriend);
+            bestFriend.setDog(saved);
+            bestFriendRepository.save(bestFriend);
+            updated = dogRepository.update(saved);
+        } else {
+            BestFriend newBestFriend = new BestFriend(saved.getId(), null, saved);
+            saved.setBestFriend(newBestFriend);
+            bestFriendRepository.save(newBestFriend);
+            updated = dogRepository.update(saved);
+        }
+        return modelMapper.map(updated, DogInfo.class);
     }
 
     public DogInfo updateDog(Integer id, DogCommand command) {
@@ -56,14 +71,19 @@ public class DogService {
             dogToUpdate.setGender(command.getGender());
             dogToUpdate.setHasWaterAndFood(command.isHasWaterAndFood());
         } else {
-            throw new DogNotFoundException();
+            throw new DogNotFoundException("Dog not found.", id);
         }
-        Dog updated = dogRepository.update(dogToUpdate);
-        return modelMapper.map(updated, DogInfo.class);
+        return modelMapper.map(dogRepository.update(dogToUpdate), DogInfo.class);
     }
 
     public List<DogInfo> findAllDogs() {
         return dogRepository.findAll()
+                .stream()
+                .map(dog -> modelMapper.map(dog, DogInfo.class)).collect(Collectors.toList());
+    }
+
+    public List<DogInfo> findAllAdoptedDogs() {
+        return dogRepository.findAllAdopted()
                 .stream()
                 .map(dog -> modelMapper.map(dog, DogInfo.class)).collect(Collectors.toList());
     }
@@ -73,30 +93,34 @@ public class DogService {
         if (found.isPresent()){
             return modelMapper.map(found.get(), DogInfo.class);
         } else {
-            throw new DogNotFoundException();
+            throw new DogNotFoundException("Dog not found.", id);
         }
     }
 
     public List<DogInfo> findAllByGender(Gender gender) {
-        List<Dog> foundByGender = dogRepository.findAllByGender(gender);
-        return foundByGender.stream().map(dog -> modelMapper.map(dog, DogInfo.class)).collect(Collectors.toList());
+        return dogRepository.findAllByGender(gender).stream().map(dog -> modelMapper.map(dog, DogInfo.class)).collect(Collectors.toList());
     }
 
     public void dogAdopted(Integer id) {
-        Dog toAdopt = dogRepository.findById(id).get();
+        Optional<Dog> toAdopt = dogRepository.findById(id);
         Cat bestFriend;
-        try {
-            bestFriend = toAdopt.getBestFriend().getCat();
-            bestFriend.setAdopted(true);
-        } catch (CatNotFoundException e) {
-            e.printStackTrace();
-        }
-        toAdopt.setAdopted(true);
+        if (toAdopt.isPresent()){
+            toAdopt.get().setAdopted(true);
+            bestFriend = toAdopt.get().getBestFriend().getCat();
+            if (bestFriend != null){
+                bestFriend.setAdopted(true);
+            } else throw new NoBestFriendException("Sadly, this dog has no best friend.", id);
+        } else throw new DogNotFoundException("Dog not found.", id);
     }
 
     public void dogDeceased(Integer id) {
-        Optional<Dog> toDelete = dogRepository.findById(id);
-        dogRepository.delete(toDelete);
+        Optional<Dog> toDeleteOptional = dogRepository.findById(id);
+        if (toDeleteOptional.isPresent()){
+            Dog toDelete = toDeleteOptional.get();
+            dogRepository.dogDeceased(toDelete);
+        } else {
+            throw new DogNotFoundException("Dog not found.", id);
+        }
     }
 
     public List<DogInfo> whoNeedsAWalk() {
@@ -113,7 +137,11 @@ public class DogService {
 
     public DogInfo walkTheDog(Integer id) {
         Dog dog = dogRepository.walkMeBoy(id);
-        return modelMapper.map(dog, DogInfo.class);
+        if (dog != null){
+            return modelMapper.map(dog, DogInfo.class);
+        } else {
+            throw new DogNotFoundException("Dog not found.", id);
+        }
     }
 
 
@@ -129,8 +157,10 @@ public class DogService {
     public CatInfo findBestFriend(Integer id) {
         Optional<Dog> found = dogRepository.findById(id);
         if (found.isPresent()){
+            if (found.get().getBestFriend() != null){
             return modelMapper.map(found.get().getBestFriend().getCat(), CatInfo.class);
-        } else throw new DogNotFoundException();
+            } else throw new NoBestFriendException("Sadly, this animal has no best friend.", id);
+        } else throw new DogNotFoundException("Dog not found.", id);
 
     }
 }

@@ -1,20 +1,17 @@
 package hu.progmasters.animalShelter.domain;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
-@EqualsAndHashCode(callSuper = true)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class Dog extends Animal{
+public class Dog {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

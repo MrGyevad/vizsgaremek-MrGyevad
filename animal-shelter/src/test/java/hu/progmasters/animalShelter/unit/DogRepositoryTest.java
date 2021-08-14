@@ -95,7 +95,7 @@ public class DogRepositoryTest {
         Dog toDelete = new Dog(1, "Sirion", 6, "Mudi", Gender.SIRE, LocalDateTime.now(), true, false, new BestFriend(1, null, null));
         dogRepository.save(toDelete);
         assertEquals(1, dogRepository.findAll().size());
-        dogRepository.delete(Optional.of(toDelete));
+        dogRepository.dogDeceased(toDelete);
         assertEquals(0, dogRepository.findAll().size());
     }
     

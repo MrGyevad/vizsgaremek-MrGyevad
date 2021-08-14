@@ -88,7 +88,7 @@ public class CatRepositoryTest {
         Cat cat1 = new Cat(1, "Lucifer", 10, "Giant", Gender.TOM, LocalDateTime.now(), true, false, new BestFriend(1, null, null));
         catRepository.save(cat1);
         assertEquals(1, catRepository.findAll().size());
-        catRepository.delete(Optional.of(cat1));
+        catRepository.catDeceased(cat1);
         assertEquals(0, catRepository.findAll().size());
     }
     

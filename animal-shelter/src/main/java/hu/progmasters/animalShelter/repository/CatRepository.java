@@ -25,12 +25,15 @@ public class CatRepository {
     }
 
     public Optional<Cat> findById(Integer id) {
-        return Optional.of(entityManager.find(Cat.class, id));
+        if (entityManager.find(Cat.class, id) != null){
+            return Optional.of(entityManager.find(Cat.class, id));
+        } else {
+            return Optional.empty();
+        }
     }
 
-    public void delete(Optional<Cat> toDelete) {
-        toDelete.ifPresent(cat -> cat.setAdopted(true));
-        toDelete.ifPresent(cat -> entityManager.remove(entityManager.contains(cat) ? cat : entityManager.merge(cat)));
+    public void catDeceased(Cat toDelete){
+        entityManager.remove(entityManager.contains(toDelete) ? toDelete : entityManager.merge(toDelete));
     }
 
     public List<Cat> findAll() {
@@ -45,9 +48,19 @@ public class CatRepository {
                 .getResultList();
     }
 
-    public Cat playWithMeGirl(Integer id){
-        Cat played = entityManager.find(Cat.class, id);
-        played.setLastPlay(LocalDateTime.now());
-        return played;
+    public Cat playWithMeGirl(Integer id) {
+        if (entityManager.find(Cat.class, id) != null) {
+            Optional<Cat> catOptional = Optional.of(entityManager.find(Cat.class, id));
+            Cat played = catOptional.get();
+            played.setLastPlay(LocalDateTime.now());
+            return entityManager.merge(played);
+        } else {
+            return null;
+        }
+    }
+    public List<Cat> findAllAdopted() {
+        return entityManager.createQuery("SELECT c FROM Cat c WHERE c.adopted IN :value", Cat.class)
+                .setParameter("value", true)
+                .getResultList();
     }
 }

@@ -1,21 +1,17 @@
 package hu.progmasters.animalShelter.domain;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Cascade;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
-@EqualsAndHashCode(callSuper = true)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class Cat extends Animal{
+public class Cat {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,4 +26,5 @@ public class Cat extends Animal{
     private boolean adopted;
     @OneToOne(mappedBy = "cat", cascade = CascadeType.ALL)
     private BestFriend bestFriend;
+
 }

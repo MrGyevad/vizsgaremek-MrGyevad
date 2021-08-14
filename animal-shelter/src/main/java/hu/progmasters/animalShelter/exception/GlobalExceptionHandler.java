@@ -49,4 +49,13 @@ public class GlobalExceptionHandler {
         error.setIdOfNotFound(exception.getIdOfLoneAnimal());
         return List.of(error);
     }
+
+    @ExceptionHandler(FriendShipNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public List<AnimalShelterError> handleFriendShipNotFoundException(FriendShipNotFoundException exception){
+        AnimalShelterError error = new AnimalShelterError();
+        error.setMessage(exception.getMessage());
+        return List.of(error);
+
+    }
 }

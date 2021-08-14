@@ -1,9 +1,10 @@
-package hu.progmasters.animalShelter.IT;
+package hu.progmasters.animalShelter.unit;
 
 import hu.progmasters.animalShelter.domain.BestFriend;
 import hu.progmasters.animalShelter.domain.Cat;
 import hu.progmasters.animalShelter.domain.Dog;
 import hu.progmasters.animalShelter.domain.Gender;
+import hu.progmasters.animalShelter.dto.BestFriendInfo;
 import hu.progmasters.animalShelter.dto.CatCommand;
 import hu.progmasters.animalShelter.dto.CatInfo;
 import hu.progmasters.animalShelter.dto.DogInfo;
@@ -44,38 +45,49 @@ public class CatServiceTest {
     private Cat cat3;
     private Cat catForUpdate;
     private Dog dog1;
+    private Dog dog2;
     private DogInfo dogInfo1;
+    private DogInfo dogInfo2;
     private CatCommand catCommand1;
     private CatCommand updateCommand1;
     private CatCommand catCommand2;
     private CatInfo catInfo1;
     private CatInfo catInfo2;
+    private BestFriendInfo bestFriendInfo1;
+    private BestFriendInfo bestFriendInfo2;
 
 
     @BeforeEach
     void init() {
+        String ldt = "2021-08-13 15:40:00";
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime dateTime = LocalDateTime.parse(ldt, formatter);
         cat1 = new Cat(1, "Lucifer", 10, "Giant", Gender.TOM,
-                LocalDateTime.now(), true, false, new BestFriend(1, null, null));
+                dateTime, true, false, new BestFriend(1, cat1, dog1));
         catForUpdate = new Cat(1, "Luci", 10, "Giant", Gender.TOM,
-                LocalDateTime.now(), true, false, new BestFriend(1, null, null));
+                dateTime, true, false, new BestFriend(1, cat1, dog1));
         cat2 = new Cat(2, "Ribizli", 5, "Halfear", Gender.PUSSY,
-                LocalDateTime.now(), true, false, new BestFriend(2, null, null));
+                dateTime, true, false, new BestFriend(2, cat2, dog2));
         dog1 = new Dog(1, "Sirion", 6, "Mudi", Gender.SIRE,
-                LocalDateTime.now(), true, false, new BestFriend(3, cat3, dog1));
+                dateTime, true, false, new BestFriend(3, cat3, dog1));
+        dog2 = new Dog(2, "Diego", 11, "Maltese", Gender.SIRE,
+                dateTime, true, false, new BestFriend(2, null, null));
         dogInfo1 = new DogInfo(1, "Sirion", 6, "Mudi", Gender.SIRE,
-                LocalDateTime.now(), true, false);
+                dateTime, true, false, bestFriendInfo1);
         catCommand1 = new CatCommand("Lucifer", 10, "Giant", Gender.TOM,
-                LocalDateTime.now(), true, false);
+                dateTime, true, false);
         updateCommand1 = new CatCommand("Luci", 10, "Giant", Gender.TOM,
-                LocalDateTime.now(), true, false);
+                dateTime, true, false);
         catCommand2 = new CatCommand("Ribizli", 5, "Halfear", Gender.PUSSY,
-                LocalDateTime.now(), true, false);
+                dateTime, true, false);
         catInfo1 = new CatInfo(1, "Lucifer", 10, "Giant", Gender.TOM,
-                LocalDateTime.now(), true, false);
+                dateTime, true, false, bestFriendInfo1);
         catInfo2 = new CatInfo(2, "Ribizli", 5, "Halfear", Gender.PUSSY,
-                LocalDateTime.now(), true, false);
+                dateTime, true, false, bestFriendInfo2);
         cat3 = new Cat(3, "Retek", 4, "Ginger", Gender.TOM,
-                LocalDateTime.now(), true, false, new BestFriend(3, cat3, dog1));
+                dateTime, true, false, new BestFriend(3, cat3, dog1));
+        bestFriendInfo1 = new BestFriendInfo(1, catInfo1, dogInfo1);
+        bestFriendInfo2 = new BestFriendInfo(2, catInfo2, dogInfo2);
     }
 
     @Test
@@ -89,12 +101,14 @@ public class CatServiceTest {
     @Test
     void testList_singleCatSaved_singleCatInList() {
         when(catRepository.save(any())).thenReturn(cat1);
+        when(catRepository.update(any())).thenReturn(cat1);
         when(catRepository.findAll()).thenReturn(List.of(cat1));
         CatInfo info = catService.saveCat(catCommand1);
         assertThat(catService.findAllCats())
                 .hasSize(1)
                 .containsExactly(info);
         verify(catRepository, times(1)).save(any());
+        verify(catRepository, times(1)).update(any());
         verify(catRepository, times(1)).findAll();
         verifyNoMoreInteractions(catRepository);
     }
@@ -104,10 +118,13 @@ public class CatServiceTest {
     void testSaveCat_SuccessfulSave(){
         when(catRepository.save(any()))
                 .thenReturn(cat1);
+        when(catRepository.update(any()))
+                .thenReturn(cat1);
         CatInfo savedCat= catService.saveCat(catCommand1);
         catInfo1.setLastPlay(savedCat.getLastPlay());
         assertEquals(catInfo1, savedCat);
         verify(catRepository, times(1)).save(any());
+        verify(catRepository, times(1)).update(any());
         verifyNoMoreInteractions(catRepository);
     }
 
@@ -119,10 +136,10 @@ public class CatServiceTest {
         when(catRepository.update(any()))
                 .thenReturn(catForUpdate);
         when(catRepository.save(any())).thenReturn(cat1);
-        catService.saveCat(catCommand1);
+        CatInfo saved = catService.saveCat(catCommand1);
         assertEquals("Luci", catService.updateCat(1, updateCommand1).getName());
         verify(catRepository, times(1)).save(any());
-        verify(catRepository, times(1)).update(any());
+        verify(catRepository, times(2)).update(any());
         verify(catRepository, times(2)).findById(any());
         verifyNoMoreInteractions(catRepository);
     }
@@ -136,6 +153,7 @@ public class CatServiceTest {
         cat2.setLastPlay(dateTime);
         when(catRepository.findAll()).thenReturn(List.of(cat2));
         when(catRepository.save(any())).thenReturn(cat2);
+        when(catRepository.update(any())).thenReturn(cat2);
         catCommand2.setLastPlay(dateTime);
         CatInfo savedCat = catService.saveCat(catCommand2);
         assertEquals(dateTime, savedCat.getLastPlay());
@@ -144,6 +162,7 @@ public class CatServiceTest {
 
         verify(catRepository, times(1)).save(any());
         verify(catRepository, times(2)).findAll();
+        verify(catRepository, times(1)).update(any());
         verifyNoMoreInteractions(catRepository);
     }
 
@@ -152,10 +171,12 @@ public class CatServiceTest {
     void testFindById_SuccessfulFind(){
         when(catRepository.findById(2)).thenReturn(Optional.of(cat2));
         when(catRepository.save(any())).thenReturn(cat2);
+        when(catRepository.update(any())).thenReturn(cat2);
         CatInfo savedCat = catService.saveCat(catCommand2);
         assertEquals("Ribizli", catService.findById(2).getName());
 
         verify(catRepository, times(1)).save(any());
+        verify(catRepository, times(1)).update(any());
         verify(catRepository, times(1)).findById(any());
         verifyNoMoreInteractions(catRepository);
     }
@@ -166,12 +187,14 @@ public class CatServiceTest {
         when(catRepository.findById(3)).thenThrow(new CatNotFoundException());
         when(catRepository.findById(2)).thenReturn(Optional.of(cat2));
         when(catRepository.save(any())).thenReturn(cat2);
+        when(catRepository.update(any())).thenReturn(cat2);
         catService.saveCat(catCommand2);
         assertEquals(catInfo2, catService.findById(2));
         assertThrows(CatNotFoundException.class, () -> {
             catService.findById(3);
         });
         verify(catRepository, times(1)).save(any());
+        verify(catRepository, times(1)).update(any());
         verify(catRepository, times(2)).findById(any());
         verifyNoMoreInteractions(catRepository);
     }

@@ -58,9 +58,10 @@ public class BestFriendRepositoryTest {
         Dog dog1 = new Dog(1, "Sirion", 6, "Mudi", Gender.SIRE, LocalDateTime.now(), true, false, new BestFriend(1, null, null));
         dogRepository.save(dog1);
         catRepository.save(cat1);
-        BestFriend saved = bestFriendRepository.findFriendshipById(1);
+        BestFriend saved = bestFriendRepository.findFriendshipById(1).get();
         bestFriendRepository.becomeBestFriends(saved, cat1, dog1);
         assertEquals(1, bestFriendRepository.findAll().size());
+        assertEquals(1, saved.getId());
         assertEquals("Lucifer", saved.getCat().getName());
         assertEquals("Sirion", saved.getDog().getName());
     }
