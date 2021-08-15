@@ -466,7 +466,17 @@ public class AnimalShelterController {
         return bestFriend;
     }
 
-
+    @Operation(summary = "Become best friends")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                    description = "The cat and the dog became best friends",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = BestFriendInfo.class))
+            ),
+            @ApiResponse(responseCode = "404",
+                    description = "Cat or dog not found",
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = AnimalShelterError.class)))})
     @PutMapping("/{catId}/{dogId}")
     @ResponseStatus(HttpStatus.OK)
     public BestFriendInfo becomeBestFriends(@PathVariable("catId") Integer catId, @PathVariable("dogId") Integer dogId){

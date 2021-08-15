@@ -73,7 +73,7 @@ public class CatServiceTest {
         dog2 = new Dog(2, "Diego", 11, "Maltese", Gender.SIRE,
                 dateTime, true, false, new BestFriend(2, null, null));
         dogInfo1 = new DogInfo(1, "Sirion", 6, "Mudi", Gender.SIRE,
-                dateTime, true, false, bestFriendInfo1);
+                dateTime, true, false);
         catCommand1 = new CatCommand("Lucifer", 10, "Giant", Gender.TOM,
                 dateTime, true, false);
         updateCommand1 = new CatCommand("Luci", 10, "Giant", Gender.TOM,
@@ -81,9 +81,9 @@ public class CatServiceTest {
         catCommand2 = new CatCommand("Ribizli", 5, "Halfear", Gender.PUSSY,
                 dateTime, true, false);
         catInfo1 = new CatInfo(1, "Lucifer", 10, "Giant", Gender.TOM,
-                dateTime, true, false, bestFriendInfo1);
+                dateTime, true, false);
         catInfo2 = new CatInfo(2, "Ribizli", 5, "Halfear", Gender.PUSSY,
-                dateTime, true, false, bestFriendInfo2);
+                dateTime, true, false);
         cat3 = new Cat(3, "Retek", 4, "Ginger", Gender.TOM,
                 dateTime, true, false, new BestFriend(3, cat3, dog1));
         bestFriendInfo1 = new BestFriendInfo(1, catInfo1, dogInfo1);

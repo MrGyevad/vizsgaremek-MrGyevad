@@ -24,5 +24,5 @@ public class CatInfo {
     private LocalDateTime lastPlay;
     private boolean hasWaterAndFood;
     private boolean adopted;
-    private BestFriendInfo bestFriendInfo;
+
 }

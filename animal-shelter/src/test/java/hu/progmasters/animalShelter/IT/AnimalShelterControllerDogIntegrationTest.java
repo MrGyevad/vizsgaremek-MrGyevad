@@ -85,33 +85,33 @@ public class AnimalShelterControllerDogIntegrationTest {
     @BeforeEach
     void init(){
 
-        String ldt = "2021-08-14 15:40:00";
+        String ldt = "2021-08-15 12:40:00";
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         LocalDateTime dateTime = LocalDateTime.parse(ldt, formatter);
         dogCommand1 = new DogCommand("Sirion", 6, "Mudi", Gender.SIRE, dateTime,
                 true, false);
         dogInfo1 = new DogInfo(1, "Sirion", 6, "Mudi", Gender.SIRE, dateTime,
-                true, false, bestFriendInfo1);
+                true, false);
         dogCommand2 = new DogCommand("Réka", 15, "Vizsla", Gender.BITCH, dateTime,
                 true, false);
         dogInfo2 = new DogInfo(2, "Réka", 15, "Vizsla", Gender.BITCH, dateTime,
-                true, false, bestFriendInfo3);
+                true, false);
         dogCommand3 = new DogCommand("Diego", 11, "Maltese", Gender.SIRE, dateTime,
                 true, false);
         dogInfo3 = new DogInfo(3, "Diego", 11, "Maltese", Gender.SIRE, dateTime,
-                true, false, bestFriendInfo2);
+                true, false);
         catCommand1 = new CatCommand("Lucifer", 10, "Giant", Gender.TOM,
                 dateTime, true, false);
         catInfo1 = new CatInfo(1, "Lucifer", 10, "Giant", Gender.TOM,
-                dateTime, true, false, bestFriendInfo1);
+                dateTime, true, false);
         catCommand2 = new CatCommand("Ribizli", 5, "Halfear", Gender.PUSSY,
                 dateTime, true, false);
         catInfo2 = new CatInfo(2, "Ribizli", 5, "Halfear", Gender.PUSSY,
-                dateTime, true, false, bestFriendInfo2);
+                dateTime, true, false);
         catCommand3 = new CatCommand("Retek", 4, "Ginger", Gender.TOM,
                 dateTime, true, false);
         catInfo3 = new CatInfo(3, "Retek", 4, "Ginger", Gender.TOM,
-                dateTime, true, false, bestFriendInfo3);
+                dateTime, true, false);
         bestFriendInfo1 = new BestFriendInfo(1, catInfo1, dogInfo1);
         bestFriendInfo2 = new BestFriendInfo(2, catInfo2, dogInfo2);
         bestFriendInfo3 = new BestFriendInfo(3, catInfo3, dogInfo3);
@@ -119,11 +119,11 @@ public class AnimalShelterControllerDogIntegrationTest {
         updateDogCommand1 = new DogCommand("Réka", 15, "Vizsla", Gender.BITCH, dateTime,
                 true, false);
         updatedDogInfo1 = new DogInfo(1, "Réka", 15, "Vizsla", Gender.BITCH, dateTime,
-                true, false, null);
+                true, false);
         updateCatCommand1 = new CatCommand("Retek", 4, "Ginger", Gender.TOM,
                 dateTime, true, false);
         updatedCatInfo1 = new CatInfo(1, "Retek", 4, "Ginger", Gender.TOM,
-                dateTime, true, false, null);
+                dateTime, true, false);
         dogNotFoundException = new DogNotFoundException("Dog not found.", 420);
         catNotFoundException = new CatNotFoundException("Cat not found.", 420);
     }

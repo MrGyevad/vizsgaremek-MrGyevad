@@ -65,8 +65,4 @@ public class BestFriendRepositoryTest {
         assertEquals("Lucifer", saved.getCat().getName());
         assertEquals("Sirion", saved.getDog().getName());
     }
-    /*
-
-    void testSaveAdoptedCat
-*/
 }

@@ -62,13 +62,13 @@ public class DogServiceTest {
         dogCommand1 = new DogCommand("Sirion", 6, "Mudi", Gender.SIRE, dateTime, true, false);
         dogCommand2 = new DogCommand("Diego", 11, "Maltese", Gender.SIRE, dateTime, true, false);
         updateCommand1 = new DogCommand("Digi", 11, "Maltese", Gender.SIRE, dateTime, true, false);
-        dogInfo1 = new DogInfo(1, "Sirion", 6, "Mudi", Gender.SIRE, dateTime, true, false, bestFriendInfo1);
-        dogInfo2 = new DogInfo(2, "Diego", 11, "Maltese", Gender.SIRE, dateTime, true, false, bestFriendInfo2);
-        dogInfo3 = new DogInfo(1, "Digi", 11, "Maltese", Gender.SIRE, dateTime, true, false, bestFriendInfo1);
+        dogInfo1 = new DogInfo(1, "Sirion", 6, "Mudi", Gender.SIRE, dateTime, true, false);
+        dogInfo2 = new DogInfo(2, "Diego", 11, "Maltese", Gender.SIRE, dateTime, true, false);
+        dogInfo3 = new DogInfo(1, "Digi", 11, "Maltese", Gender.SIRE, dateTime, true, false);
         catInfo1 = new CatInfo(1, "Lucifer", 10, "Giant", Gender.TOM,
-                dateTime, true, false, bestFriendInfo1);
+                dateTime, true, false);
         catInfo2 = new CatInfo(2, "Ribizli", 5, "Halfear", Gender.PUSSY,
-                dateTime, true, false, bestFriendInfo2);
+                dateTime, true, false);
         bestFriendInfo1 = new BestFriendInfo(1, catInfo1, dogInfo1);
         bestFriendInfo2 = new BestFriendInfo(2, catInfo2, dogInfo2);
 

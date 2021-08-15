@@ -7,9 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.PastOrPresent;
-import javax.validation.constraints.PositiveOrZero;
+import javax.validation.constraints.*;
 import java.time.LocalDateTime;
 
 
@@ -29,6 +27,10 @@ public class CatCommand {
     @PastOrPresent
     @JsonFormat(pattern = "yyyy-MM-dd@HH:mm:ss")
     private LocalDateTime lastPlay;
+    @NotNull
+    @AssertTrue
     private boolean hasWaterAndFood;
+    @NotNull
+    @AssertFalse
     private boolean adopted;
 }

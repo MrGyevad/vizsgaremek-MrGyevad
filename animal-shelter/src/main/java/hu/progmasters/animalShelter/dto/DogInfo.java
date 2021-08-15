@@ -24,5 +24,4 @@ public class DogInfo {
     private LocalDateTime lastWalk;
     private boolean hasWaterAndFood;
     private boolean adopted;
-    private BestFriendInfo bestFriendInfo;
 }
