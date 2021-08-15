@@ -10,6 +10,7 @@ import javax.persistence.PersistenceContext;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 @Repository
 public class DogRepository {
@@ -49,10 +50,11 @@ public class DogRepository {
                 .getResultList();
     }
 
-    public Dog walkMeBoy(Integer id){
-        if (entityManager.find(Dog.class, id) != null) {
-            Optional<Dog> dogOptional = Optional.of(entityManager.find(Dog.class, id));
+    public Dog walkMeBoy(Integer id) throws InterruptedException {
+        Optional<Dog> dogOptional = findById(id);
+        if (dogOptional.isPresent()) {
             Dog walked = dogOptional.get();
+            TimeUnit.MILLISECONDS.sleep(1);
             walked.setLastWalk(LocalDateTime.now());
             return entityManager.merge(walked);
         } else {

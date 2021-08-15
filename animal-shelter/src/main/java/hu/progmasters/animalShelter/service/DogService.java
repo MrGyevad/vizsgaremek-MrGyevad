@@ -43,21 +43,17 @@ public class DogService {
     public DogInfo saveDog(DogCommand command) {
         Dog toSave = modelMapper.map(command, Dog.class);
         Dog saved = dogRepository.save(toSave);
-        Dog updated;
-        BestFriend bestFriend;
         if (bestFriendRepository.findFriendshipById(saved.getId()).isPresent()){
-            bestFriend = bestFriendRepository.findFriendshipById(toSave.getId()).get();
+            BestFriend bestFriend = bestFriendRepository.findFriendshipById(toSave.getId()).get();
             saved.setBestFriend(bestFriend);
             bestFriend.setDog(saved);
             bestFriendRepository.save(bestFriend);
-            updated = dogRepository.update(saved);
         } else {
             BestFriend newBestFriend = new BestFriend(saved.getId(), null, saved);
             saved.setBestFriend(newBestFriend);
             bestFriendRepository.save(newBestFriend);
-            updated = dogRepository.update(saved);
         }
-        return modelMapper.map(updated, DogInfo.class);
+        return modelMapper.map(dogRepository.update(saved), DogInfo.class);
     }
 
     public DogInfo updateDog(Integer id, DogCommand command) {
@@ -135,7 +131,7 @@ public class DogService {
         return needWalk.stream().map(dog -> modelMapper.map(dog, DogInfo.class)).collect(Collectors.toList());
     }
 
-    public DogInfo walkTheDog(Integer id) {
+    public DogInfo walkTheDog(Integer id) throws InterruptedException {
         Dog dog = dogRepository.walkMeBoy(id);
         if (dog != null){
             return modelMapper.map(dog, DogInfo.class);

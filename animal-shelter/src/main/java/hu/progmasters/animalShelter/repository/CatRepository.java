@@ -9,6 +9,7 @@ import javax.persistence.PersistenceContext;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 @Repository
 public class CatRepository {
@@ -48,10 +49,11 @@ public class CatRepository {
                 .getResultList();
     }
 
-    public Cat playWithMeGirl(Integer id) {
-        if (entityManager.find(Cat.class, id) != null) {
-            Optional<Cat> catOptional = Optional.of(entityManager.find(Cat.class, id));
+    public Cat playWithMeGirl(Integer id) throws InterruptedException {
+        Optional<Cat> catOptional = findById(id);
+        if (catOptional.isPresent()) {
             Cat played = catOptional.get();
+            TimeUnit.MILLISECONDS.sleep(1);
             played.setLastPlay(LocalDateTime.now());
             return entityManager.merge(played);
         } else {

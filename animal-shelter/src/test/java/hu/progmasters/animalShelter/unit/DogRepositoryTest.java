@@ -131,7 +131,7 @@ public class DogRepositoryTest {
     @Test
     @Order(7)
     @Transactional
-    void testWalkMeBoy_dogWalked(){
+    void testWalkMeBoy_dogWalked() throws InterruptedException {
         Dog dog1 = new Dog(1, "Sirion", 6, "Mudi", Gender.SIRE, LocalDateTime.now(), true, false, new BestFriend(1, null, null));
         dogRepository.save(dog1);
         LocalDateTime originalTime = dog1.getLastWalk();

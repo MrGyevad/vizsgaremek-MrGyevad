@@ -205,7 +205,7 @@ public class DogServiceTest {
     }
 
     @Test
-    void testWalkTheDog_successfulWalk(){
+    void testWalkTheDog_successfulWalk() throws InterruptedException {
         DogInfo dog1Info = modelMapper.map(dog1, DogInfo.class);
         Dog dog1notWalked;
         dog1notWalked = modelMapper.map(dog1Info, Dog.class);

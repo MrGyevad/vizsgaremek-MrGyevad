@@ -29,6 +29,18 @@ Content-Type: application/json
   "adopted": false
 }
 ### Create Sirion
+
+POST http://localhost:8080/api/cat
+Content-Type: application/json
+
+{"name": "Lucifer",
+  "age": 10,
+  "breed": "Giant",
+  "gender": "TOM",
+  "hasWaterAndFood": true,
+  "adopted": false
+}
+### Create Lucifer
 POST http://localhost:8080/api/dog
 Content-Type: application/json
 

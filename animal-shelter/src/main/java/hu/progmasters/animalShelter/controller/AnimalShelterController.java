@@ -44,11 +44,11 @@ public class AnimalShelterController {
     @ApiResponse(responseCode = "200",
             description = "List all animals living in the shelter.",
             content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                    array = @ArraySchema(schema = @Schema(implementation = AnimalInfo.class))))
+                    array = @ArraySchema(schema = @Schema(implementation = List.class))))
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<AnimalInfo> findAllResidents() {
-        List<AnimalInfo> animalInfoList;
+    public List findAllResidents() {
+        List animalInfoList;
         log.info("HTTP GET /api - List all animals");
         animalInfoList = animalService.findAllAnimals();
         log.info(String.format("HTTP Response: FOUND, Body: %s", animalInfoList));
@@ -210,7 +210,7 @@ public class AnimalShelterController {
                     schema = @Schema(implementation = AnimalShelterError.class)))})
     @PutMapping("/dog/walk/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public DogInfo walkWithMe(@PathVariable("id") Integer id) {
+    public DogInfo walkWithMe(@PathVariable("id") Integer id) throws InterruptedException {
         log.info(String.format("HTTP PUT /api/dog/walk/%s - Walk dog with ID", id));
         DogInfo walked = dogService.walkTheDog(id);
         log.info(String.format("HTTP Response OK, This dog walked: %s", walked));
@@ -408,7 +408,7 @@ public class AnimalShelterController {
                             schema = @Schema(implementation = AnimalShelterError.class)))})
     @PutMapping("/cat/play/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public CatInfo playWithMe(@PathVariable("id") Integer id) {
+    public CatInfo playWithMe(@PathVariable("id") Integer id) throws InterruptedException {
         log.info(String.format("HTTP PUT /api/cat/play/%s - Play cat with ID", id));
         CatInfo played = catService.playWithCat(id);
         log.info(String.format("HTTP Response OK, This cat played: %s", played));

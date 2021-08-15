@@ -124,7 +124,7 @@ public class CatRepositoryTest {
     @Test
     @Order(7)
     @Transactional
-    void testPlayWithMeGirl_playedWithCat(){
+    void testPlayWithMeGirl_playedWithCat() throws InterruptedException {
         Cat cat1 = new Cat(1, "Lucifer", 10, "Giant", Gender.TOM, LocalDateTime.now(), true, false, new BestFriend(1, null, null));
         catRepository.save(cat1);
         LocalDateTime originalTime = cat1.getLastPlay();

@@ -9,6 +9,7 @@ import hu.progmasters.animalShelter.dto.CatInfo;
 import hu.progmasters.animalShelter.dto.DogInfo;
 import hu.progmasters.animalShelter.exception.CatNotFoundException;
 import hu.progmasters.animalShelter.exception.DogNotFoundException;
+import hu.progmasters.animalShelter.exception.FriendShipNotFoundException;
 import hu.progmasters.animalShelter.exception.NoBestFriendException;
 import hu.progmasters.animalShelter.repository.CatRepository;
 import hu.progmasters.animalShelter.repository.BestFriendRepository;
@@ -137,7 +138,7 @@ public class CatService {
         return needToPlay.stream().map(cat -> modelMapper.map(cat, CatInfo.class)).collect(Collectors.toList());
     }
 
-    public CatInfo playWithCat(Integer id) {
+    public CatInfo playWithCat(Integer id) throws InterruptedException {
         Cat played = catRepository.playWithMeGirl(id);
         if (played != null){
         return modelMapper.map(played, CatInfo.class);
@@ -159,8 +160,10 @@ public class CatService {
         Optional<Cat> found = catRepository.findById(id);
         if (found.isPresent()){
             if (found.get().getBestFriend() != null){
-            return modelMapper.map(found.get().getBestFriend().getDog(), DogInfo.class);
+                if (found.get().getBestFriend().getDog() != null) {
+                    return modelMapper.map(found.get().getBestFriend().getDog(), DogInfo.class);
             } else throw new NoBestFriendException("Sadly, this animal has no best friend.", id);
+                } else throw new FriendShipNotFoundException("Friendship not found");
         } else throw new CatNotFoundException("Cat not found.", id);
     }
 }
