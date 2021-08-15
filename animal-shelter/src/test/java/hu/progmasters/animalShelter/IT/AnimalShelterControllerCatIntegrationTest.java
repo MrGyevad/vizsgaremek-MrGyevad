@@ -85,7 +85,7 @@ public class AnimalShelterControllerCatIntegrationTest {
     @BeforeEach
     void init(){
 
-        String ldt = "2021-08-15 12:40:00";
+        String ldt = "2021-08-15 19:40:00";
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         LocalDateTime dateTime = LocalDateTime.parse(ldt, formatter);
         dogCommand1 = new DogCommand("Sirion", 6, "Mudi", Gender.SIRE, dateTime,
