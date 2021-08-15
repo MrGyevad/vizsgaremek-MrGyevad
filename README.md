@@ -11,9 +11,7 @@ docker stop animalshelterapp
 
 docker rm animalshelterapp
 
-docker run --name animalshelterapp --network animalshelternetwork -p 8080:8080 -d anima
-
-lshelterapp
+docker run --name animalshelterapp --network animalshelternetwork -p 8080:8080 -d animalshelterapp
 
 
 
