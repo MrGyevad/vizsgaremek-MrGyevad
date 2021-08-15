@@ -2,12 +2,19 @@ Az applikáció egy állatmenhelyi nyilvántartó, melyben különböző adatoka
 
 
 Docker utasítások:
+
 mvn clean package
+
 docker build -t animalshelterapp .
+
 docker stop animalshelterapp
+
 docker rm animalshelterapp
+
 docker run --name animalshelterapp --network animalshelternetwork -p 8080:8080 -d anima
+
 lshelterapp
+
 
 
 # Vizsgaremek
