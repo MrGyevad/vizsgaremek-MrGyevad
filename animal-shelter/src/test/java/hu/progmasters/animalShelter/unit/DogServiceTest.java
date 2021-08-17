@@ -1,5 +1,6 @@
 package hu.progmasters.animalShelter.unit;
 
+import hu.progmasters.animalShelter.domain.AnimalShelter;
 import hu.progmasters.animalShelter.domain.BestFriend;
 import hu.progmasters.animalShelter.domain.Dog;
 import hu.progmasters.animalShelter.domain.Gender;
@@ -8,6 +9,7 @@ import hu.progmasters.animalShelter.exception.DogNotFoundException;
 import hu.progmasters.animalShelter.repository.BestFriendRepository;
 import hu.progmasters.animalShelter.repository.CatRepository;
 import hu.progmasters.animalShelter.repository.DogRepository;
+import hu.progmasters.animalShelter.service.AnimalShelterService;
 import hu.progmasters.animalShelter.service.DogService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,11 +31,12 @@ import static org.mockito.Mockito.*;
 public class DogServiceTest {
 
     DogRepository dogRepository = mock(DogRepository.class);
+    AnimalShelterService animalShelterService;
     BestFriendRepository bestFriendRepository = mock(BestFriendRepository.class);
     CatRepository catRepository = mock(CatRepository.class);
     ModelMapper modelMapper = new ModelMapper();
 
-    DogService dogService = new DogService(dogRepository, catRepository, bestFriendRepository, modelMapper);
+    DogService dogService = new DogService(dogRepository, catRepository, animalShelterService, bestFriendRepository, modelMapper);
 
     private Dog dog1;
     private DogCommand dogCommand1;
@@ -55,20 +58,20 @@ public class DogServiceTest {
         String ldt = "2021-08-13 15:40:00";
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         LocalDateTime dateTime = LocalDateTime.parse(ldt, formatter);
-        dog1 = new Dog(1, "Sirion", 6, "Mudi", Gender.SIRE, dateTime, true, false, new BestFriend(1, null, null));
-        dog2 = new Dog(2, "Diego", 11, "Maltese", Gender.SIRE, dateTime, true, false, new BestFriend(2, null, null));
-        dog3 = new Dog(1, "Digi", 11, "Maltese", Gender.SIRE, dateTime, true, false, new BestFriend(1, null, null));
-        dogForUpdate = new Dog(1, "Digi", 11, "Maltese", Gender.SIRE, dateTime, true, false, new BestFriend(1, null, null));
-        dogCommand1 = new DogCommand("Sirion", 6, "Mudi", Gender.SIRE, dateTime, true, false);
-        dogCommand2 = new DogCommand("Diego", 11, "Maltese", Gender.SIRE, dateTime, true, false);
-        updateCommand1 = new DogCommand("Digi", 11, "Maltese", Gender.SIRE, dateTime, true, false);
-        dogInfo1 = new DogInfo(1, "Sirion", 6, "Mudi", Gender.SIRE, dateTime, true, false);
-        dogInfo2 = new DogInfo(2, "Diego", 11, "Maltese", Gender.SIRE, dateTime, true, false);
-        dogInfo3 = new DogInfo(1, "Digi", 11, "Maltese", Gender.SIRE, dateTime, true, false);
+        dog1 = new Dog(1, "Sirion", 6, "Mudi", Gender.SIRE, dateTime, true, false, new BestFriend(1, null, null), new AnimalShelter());
+        dog2 = new Dog(2, "Diego", 11, "Maltese", Gender.SIRE, dateTime, true, false, new BestFriend(2, null, null), new AnimalShelter());
+        dog3 = new Dog(1, "Digi", 11, "Maltese", Gender.SIRE, dateTime, true, false, new BestFriend(1, null, null), new AnimalShelter());
+        dogForUpdate = new Dog(1, "Digi", 11, "Maltese", Gender.SIRE, dateTime, true, false, new BestFriend(1, null, null), new AnimalShelter());
+        dogCommand1 = new DogCommand("Sirion", 6, "Mudi", Gender.SIRE, dateTime, true, false, 1);
+        dogCommand2 = new DogCommand("Diego", 11, "Maltese", Gender.SIRE, dateTime, true, false, 1);
+        updateCommand1 = new DogCommand("Digi", 11, "Maltese", Gender.SIRE, dateTime, true, false, 1);
+        dogInfo1 = new DogInfo(1, "Sirion", 6, "Mudi", Gender.SIRE, dateTime, true, false, 1);
+        dogInfo2 = new DogInfo(2, "Diego", 11, "Maltese", Gender.SIRE, dateTime, true, false, 1);
+        dogInfo3 = new DogInfo(1, "Digi", 11, "Maltese", Gender.SIRE, dateTime, true, false, 1);
         catInfo1 = new CatInfo(1, "Lucifer", 10, "Giant", Gender.TOM,
-                dateTime, true, false);
+                dateTime, true, false, 1);
         catInfo2 = new CatInfo(2, "Ribizli", 5, "Halfear", Gender.PUSSY,
-                dateTime, true, false);
+                dateTime, true, false, 1);
         bestFriendInfo1 = new BestFriendInfo(1, catInfo1, dogInfo1);
         bestFriendInfo2 = new BestFriendInfo(2, catInfo2, dogInfo2);
 
@@ -115,7 +118,7 @@ public class DogServiceTest {
     @Test
     @Transactional
     void testUpdateDog_SuccessfulUpdate(){
-        Dog digi = new Dog(1, "Digi", 11, "Maltese", Gender.SIRE, LocalDateTime.now(), true, false, new BestFriend(1, null, null));
+        Dog digi = new Dog(1, "Digi", 11, "Maltese", Gender.SIRE, LocalDateTime.now(), true, false, new BestFriend(1, null, null), new AnimalShelter());
         when(dogRepository.findById(any()))
                 .thenReturn(Optional.of(digi));
         when(dogRepository.update(any()))
@@ -133,7 +136,7 @@ public class DogServiceTest {
         String ldt = "2021-08-03 15:40:00";
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         LocalDateTime dateTime = LocalDateTime.parse(ldt, formatter);
-        Dog sirion = new Dog(1, "Sirion", 6, "Mudi", Gender.SIRE, dateTime, true, false, new BestFriend(1, null, null));
+        Dog sirion = new Dog(1, "Sirion", 6, "Mudi", Gender.SIRE, dateTime, true, false, new BestFriend(1, null, null), new AnimalShelter());
         when(dogRepository.findAll()).thenReturn(List.of(sirion));
         when(dogRepository.save(any())).thenReturn(sirion);
         when(dogRepository.update(any())).thenReturn(sirion);

@@ -26,5 +26,15 @@ public class Cat {
     private boolean adopted;
     @OneToOne(mappedBy = "cat", cascade = CascadeType.ALL)
     private BestFriend bestFriend;
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private AnimalShelter animalShelter;
+
+    public AnimalShelter getAnimalShelter() {
+        return animalShelter;
+    }
+
+    public void setAnimalShelter(AnimalShelter animalShelter) {
+        this.animalShelter = animalShelter;
+    }
 
 }

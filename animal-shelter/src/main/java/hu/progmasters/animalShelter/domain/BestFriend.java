@@ -17,7 +17,7 @@ public class BestFriend {
     private Integer id;
 
     @OneToOne(orphanRemoval = true,
-    cascade = CascadeType.ALL)
+            cascade = CascadeType.ALL)
     private Cat cat;
 
     @OneToOne(orphanRemoval = true,

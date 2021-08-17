@@ -7,7 +7,6 @@ import hu.progmasters.animalShelter.domain.Gender;
 import hu.progmasters.animalShelter.dto.CatInfo;
 import hu.progmasters.animalShelter.dto.DogCommand;
 import hu.progmasters.animalShelter.dto.DogInfo;
-import hu.progmasters.animalShelter.exception.CatNotFoundException;
 import hu.progmasters.animalShelter.exception.DogNotFoundException;
 import hu.progmasters.animalShelter.exception.NoBestFriendException;
 import hu.progmasters.animalShelter.repository.CatRepository;
@@ -30,18 +29,21 @@ public class DogService {
 
     private final DogRepository dogRepository;
     private final CatRepository catRepository;
+    private final AnimalShelterService animalShelterService;
     private final BestFriendRepository bestFriendRepository;
     private final ModelMapper modelMapper;
 
-    public DogService(DogRepository dogRepository, CatRepository catRepository, BestFriendRepository bestFriendRepository, ModelMapper modelMapper) {
+    public DogService(DogRepository dogRepository, CatRepository catRepository, AnimalShelterService animalShelterService, BestFriendRepository bestFriendRepository, ModelMapper modelMapper) {
         this.dogRepository = dogRepository;
         this.catRepository = catRepository;
+        this.animalShelterService = animalShelterService;
         this.bestFriendRepository = bestFriendRepository;
         this.modelMapper = modelMapper;
     }
 
     public DogInfo saveDog(DogCommand command) {
         Dog toSave = modelMapper.map(command, Dog.class);
+        toSave.setAnimalShelter(animalShelterService.findByIdForService(command.getAnimalShelterId()));
         Dog saved = dogRepository.save(toSave);
         if (bestFriendRepository.findFriendshipById(saved.getId()).isPresent()){
             BestFriend bestFriend = bestFriendRepository.findFriendshipById(toSave.getId()).get();
@@ -53,7 +55,9 @@ public class DogService {
             saved.setBestFriend(newBestFriend);
             bestFriendRepository.save(newBestFriend);
         }
-        return modelMapper.map(dogRepository.update(saved), DogInfo.class);
+        DogInfo toReturn = modelMapper.map(dogRepository.update(saved), DogInfo.class);
+        toReturn.setAnimalShelterId(saved.getAnimalShelter().getId());
+        return toReturn;
     }
 
     public DogInfo updateDog(Integer id, DogCommand command) {

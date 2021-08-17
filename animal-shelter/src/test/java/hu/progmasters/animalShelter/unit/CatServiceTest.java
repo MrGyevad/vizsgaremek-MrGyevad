@@ -1,9 +1,6 @@
 package hu.progmasters.animalShelter.unit;
 
-import hu.progmasters.animalShelter.domain.BestFriend;
-import hu.progmasters.animalShelter.domain.Cat;
-import hu.progmasters.animalShelter.domain.Dog;
-import hu.progmasters.animalShelter.domain.Gender;
+import hu.progmasters.animalShelter.domain.*;
 import hu.progmasters.animalShelter.dto.BestFriendInfo;
 import hu.progmasters.animalShelter.dto.CatCommand;
 import hu.progmasters.animalShelter.dto.CatInfo;
@@ -63,29 +60,29 @@ public class CatServiceTest {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         LocalDateTime dateTime = LocalDateTime.parse(ldt, formatter);
         cat1 = new Cat(1, "Lucifer", 10, "Giant", Gender.TOM,
-                dateTime, true, false, new BestFriend(1, cat1, dog1));
+                dateTime, true, false, new BestFriend(1, cat1, dog1), new AnimalShelter());
         catForUpdate = new Cat(1, "Luci", 10, "Giant", Gender.TOM,
-                dateTime, true, false, new BestFriend(1, cat1, dog1));
+                dateTime, true, false, new BestFriend(1, cat1, dog1), new AnimalShelter());
         cat2 = new Cat(2, "Ribizli", 5, "Halfear", Gender.PUSSY,
-                dateTime, true, false, new BestFriend(2, cat2, dog2));
+                dateTime, true, false, new BestFriend(2, cat2, dog2), new AnimalShelter());
         dog1 = new Dog(1, "Sirion", 6, "Mudi", Gender.SIRE,
-                dateTime, true, false, new BestFriend(3, cat3, dog1));
+                dateTime, true, false, new BestFriend(3, cat3, dog1), new AnimalShelter());
         dog2 = new Dog(2, "Diego", 11, "Maltese", Gender.SIRE,
-                dateTime, true, false, new BestFriend(2, null, null));
+                dateTime, true, false, new BestFriend(2, null, null), new AnimalShelter());
         dogInfo1 = new DogInfo(1, "Sirion", 6, "Mudi", Gender.SIRE,
-                dateTime, true, false);
+                dateTime, true, false, 1);
         catCommand1 = new CatCommand("Lucifer", 10, "Giant", Gender.TOM,
-                dateTime, true, false);
+                dateTime, true, false, 1);
         updateCommand1 = new CatCommand("Luci", 10, "Giant", Gender.TOM,
-                dateTime, true, false);
+                dateTime, true, false, 1);
         catCommand2 = new CatCommand("Ribizli", 5, "Halfear", Gender.PUSSY,
-                dateTime, true, false);
+                dateTime, true, false, 1);
         catInfo1 = new CatInfo(1, "Lucifer", 10, "Giant", Gender.TOM,
-                dateTime, true, false);
+                dateTime, true, false, 1);
         catInfo2 = new CatInfo(2, "Ribizli", 5, "Halfear", Gender.PUSSY,
-                dateTime, true, false);
+                dateTime, true, false, 1);
         cat3 = new Cat(3, "Retek", 4, "Ginger", Gender.TOM,
-                dateTime, true, false, new BestFriend(3, cat3, dog1));
+                dateTime, true, false, new BestFriend(3, cat3, dog1), new AnimalShelter());
         bestFriendInfo1 = new BestFriendInfo(1, catInfo1, dogInfo1);
         bestFriendInfo2 = new BestFriendInfo(2, catInfo2, dogInfo2);
     }

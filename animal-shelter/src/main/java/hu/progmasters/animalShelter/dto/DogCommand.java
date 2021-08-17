@@ -33,4 +33,7 @@ public class DogCommand {
     @NotNull
     @AssertFalse
     private boolean adopted;
+    @Positive(message = "Must be positive.")
+    @NotNull(message = "No club found with ID")
+    private Integer animalShelterId;
 }

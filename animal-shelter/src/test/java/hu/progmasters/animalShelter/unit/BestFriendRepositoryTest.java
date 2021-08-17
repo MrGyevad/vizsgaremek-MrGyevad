@@ -1,9 +1,6 @@
 package hu.progmasters.animalShelter.unit;
 
-import hu.progmasters.animalShelter.domain.BestFriend;
-import hu.progmasters.animalShelter.domain.Cat;
-import hu.progmasters.animalShelter.domain.Dog;
-import hu.progmasters.animalShelter.domain.Gender;
+import hu.progmasters.animalShelter.domain.*;
 import hu.progmasters.animalShelter.repository.BestFriendRepository;
 import hu.progmasters.animalShelter.repository.CatRepository;
 import hu.progmasters.animalShelter.repository.DogRepository;
@@ -54,8 +51,8 @@ public class BestFriendRepositoryTest {
     @Transactional
     void testBecomeBestFriends_SuccessfulSave() {
         assertTrue(bestFriendRepository.findAll().isEmpty());
-        Cat cat1 = new Cat(1, "Lucifer", 10, "Giant", Gender.TOM, LocalDateTime.now(), true, false, new BestFriend(1, null, null));
-        Dog dog1 = new Dog(1, "Sirion", 6, "Mudi", Gender.SIRE, LocalDateTime.now(), true, false, new BestFriend(1, null, null));
+        Cat cat1 = new Cat(1, "Lucifer", 10, "Giant", Gender.TOM, LocalDateTime.now(), true, false, new BestFriend(1, null, null), new AnimalShelter());
+        Dog dog1 = new Dog(1, "Sirion", 6, "Mudi", Gender.SIRE, LocalDateTime.now(), true, false, new BestFriend(1, null, null), new AnimalShelter());
         dogRepository.save(dog1);
         catRepository.save(cat1);
         BestFriend saved = bestFriendRepository.findFriendshipById(1).get();

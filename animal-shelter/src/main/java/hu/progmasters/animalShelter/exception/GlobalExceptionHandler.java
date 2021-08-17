@@ -56,6 +56,14 @@ public class GlobalExceptionHandler {
         AnimalShelterError error = new AnimalShelterError();
         error.setMessage(exception.getMessage());
         return List.of(error);
+    }
 
+    @ExceptionHandler(AnimalShelterNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public List<AnimalShelterError> handleAnimalShelterNotFoundException(AnimalShelterNotFoundException exception){
+        AnimalShelterError error = new AnimalShelterError();
+        error.setMessage(exception.getMessage());
+        error.setIdOfNotFound(exception.getIdOfNotFound());
+        return List.of(error);
     }
 }

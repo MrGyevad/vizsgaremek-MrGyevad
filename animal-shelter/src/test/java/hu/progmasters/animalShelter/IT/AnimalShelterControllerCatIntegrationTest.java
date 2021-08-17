@@ -2,13 +2,16 @@ package hu.progmasters.animalShelter.IT;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
+import hu.progmasters.animalShelter.domain.AnimalShelter;
 import hu.progmasters.animalShelter.domain.Gender;
 import hu.progmasters.animalShelter.dto.*;
 import hu.progmasters.animalShelter.exception.CatNotFoundException;
 import hu.progmasters.animalShelter.exception.DogNotFoundException;
+import hu.progmasters.animalShelter.repository.AnimalShelterRepository;
 import hu.progmasters.animalShelter.repository.BestFriendRepository;
 import hu.progmasters.animalShelter.repository.CatRepository;
 import hu.progmasters.animalShelter.repository.DogRepository;
+import hu.progmasters.animalShelter.service.AnimalShelterService;
 import hu.progmasters.animalShelter.service.CatService;
 import hu.progmasters.animalShelter.service.DogService;
 import org.junit.jupiter.api.BeforeEach;
@@ -59,6 +62,13 @@ public class AnimalShelterControllerCatIntegrationTest {
     @Autowired
     CatService catService;
 
+    @Autowired
+    AnimalShelterService animalShelterService;
+
+    @Autowired
+    AnimalShelterRepository animalShelterRepository;
+
+    private static AnimalShelterCommand animalShelterCommand;
     private static DogCommand dogCommand1;
     private static DogInfo dogInfo1;
     private static CatCommand catCommand1;
@@ -85,45 +95,46 @@ public class AnimalShelterControllerCatIntegrationTest {
     @BeforeEach
     void init(){
 
-        String ldt = "2021-08-15 19:40:00";
+        String ldt = "2021-08-16 17:40:00";
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         LocalDateTime dateTime = LocalDateTime.parse(ldt, formatter);
+        animalShelterCommand = new AnimalShelterCommand("HopeForPaws");
         dogCommand1 = new DogCommand("Sirion", 6, "Mudi", Gender.SIRE, dateTime,
-                true, false);
+                true, false, 1);
         dogInfo1 = new DogInfo(1, "Sirion", 6, "Mudi", Gender.SIRE, dateTime,
-                true, false);
+                true, false, 1);
         dogCommand2 = new DogCommand("Réka", 15, "Vizsla", Gender.BITCH, dateTime,
-                true, false);
+                true, false, 1);
         dogInfo2 = new DogInfo(2, "Réka", 15, "Vizsla", Gender.BITCH, dateTime,
-                true, false);
+                true, false, 1);
         dogCommand3 = new DogCommand("Diego", 11, "Maltese", Gender.SIRE, dateTime,
-                true, false);
+                true, false, 1);
         dogInfo3 = new DogInfo(3, "Diego", 11, "Maltese", Gender.SIRE, dateTime,
-                true, false);
+                true, false, 1);
         catCommand1 = new CatCommand("Lucifer", 10, "Giant", Gender.TOM,
-                dateTime, true, false);
+                dateTime, true, false, 1);
         catInfo1 = new CatInfo(1, "Lucifer", 10, "Giant", Gender.TOM,
-                dateTime, true, false);
+                dateTime, true, false, 1);
         catCommand2 = new CatCommand("Ribizli", 5, "Halfear", Gender.PUSSY,
-                dateTime, true, false);
+                dateTime, true, false, 1);
         catInfo2 = new CatInfo(2, "Ribizli", 5, "Halfear", Gender.PUSSY,
-                dateTime, true, false);
+                dateTime, true, false, 1);
         catCommand3 = new CatCommand("Retek", 4, "Ginger", Gender.TOM,
-                dateTime, true, false);
+                dateTime, true, false, 1);
         catInfo3 = new CatInfo(3, "Retek", 4, "Ginger", Gender.TOM,
-                dateTime, true, false);
+                dateTime, true, false, 1);
         bestFriendInfo1 = new BestFriendInfo(1, catInfo1, dogInfo1);
         bestFriendInfo2 = new BestFriendInfo(2, catInfo2, dogInfo2);
         bestFriendInfo3 = new BestFriendInfo(3, catInfo3, dogInfo3);
         updatedBestFriendInfo1 = new BestFriendInfo(1, catInfo1, updatedDogInfo1);
         updateDogCommand1 = new DogCommand("Réka", 15, "Vizsla", Gender.BITCH, dateTime,
-                true, false);
+                true, false, 1);
         updatedDogInfo1 = new DogInfo(1, "Réka", 15, "Vizsla", Gender.BITCH, dateTime,
-                true, false);
+                true, false, 1);
         updateCatCommand1 = new CatCommand("Retek", 4, "Ginger", Gender.TOM,
-                dateTime, true, false);
+                dateTime, true, false, 1);
         updatedCatInfo1 = new CatInfo(1, "Retek", 4, "Ginger", Gender.TOM,
-                dateTime, true, false);
+                dateTime, true, false, 1);
         dogNotFoundException = new DogNotFoundException("Dog not found.", 420);
         catNotFoundException = new CatNotFoundException("Cat not found.", 420);
     }
