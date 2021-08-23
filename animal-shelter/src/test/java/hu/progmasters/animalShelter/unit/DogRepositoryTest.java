@@ -4,6 +4,7 @@ import hu.progmasters.animalShelter.domain.AnimalShelter;
 import hu.progmasters.animalShelter.domain.BestFriend;
 import hu.progmasters.animalShelter.domain.Dog;
 import hu.progmasters.animalShelter.domain.Gender;
+import hu.progmasters.animalShelter.dto.DogInfo;
 import hu.progmasters.animalShelter.exception.DogNotFoundException;
 import hu.progmasters.animalShelter.repository.BestFriendRepository;
 import hu.progmasters.animalShelter.repository.DogRepository;
@@ -29,6 +30,8 @@ public class DogRepositoryTest {
 
     @Autowired
     BestFriendRepository bestFriendRepository;
+
+
 
     @Test
     @Order(1)
@@ -127,22 +130,6 @@ public class DogRepositoryTest {
         dogRepository.save(dog3);
         assertEquals(1, dogRepository.findAllByGender(Gender.BITCH).size());
         assertEquals(2, dogRepository.findAllByGender(Gender.SIRE).size());
-    }
-    
-    @Test
-    @Order(7)
-    @Transactional
-    void testWalkMeBoy_dogWalked() throws InterruptedException {
-        Dog dog1 = new Dog(1, "Sirion", 6, "Mudi", Gender.SIRE, LocalDateTime.now(), true, false, new BestFriend(1, null, null), new AnimalShelter());
-        dogRepository.save(dog1);
-        LocalDateTime originalTime = dog1.getLastWalk();
-        if (dogRepository.findById(1).isPresent()) {
-            assertEquals(originalTime, dogRepository.findById(1).get().getLastWalk());
-            dogRepository.walkMeBoy(1);
-            assertNotEquals(originalTime, dogRepository.findById(1).get().getLastWalk());
-        } else {
-            throw new DogNotFoundException();
-        }
     }
 
     /*

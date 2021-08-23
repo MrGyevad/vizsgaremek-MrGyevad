@@ -121,16 +121,4 @@ public class CatRepositoryTest {
         assertEquals(1, catRepository.findAllByGender(Gender.PUSSY).size());
         assertEquals(2, catRepository.findAllByGender(Gender.TOM).size());
     }
-    
-    @Test
-    @Order(7)
-    @Transactional
-    void testPlayWithMeGirl_playedWithCat() throws InterruptedException {
-        Cat cat1 = new Cat(1, "Lucifer", 10, "Giant", Gender.TOM, LocalDateTime.now(), true, false, new BestFriend(1, null, null), new AnimalShelter());
-        catRepository.save(cat1);
-        LocalDateTime originalTime = cat1.getLastPlay();
-        assertEquals(originalTime, catRepository.findById(1).get().getLastPlay());
-        catRepository.playWithMeGirl(1);
-        assertNotEquals(originalTime, catRepository.findById(1).get().getLastPlay());
-    }
  }

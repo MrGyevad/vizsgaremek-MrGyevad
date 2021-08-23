@@ -20,6 +20,7 @@ import org.modelmapper.ModelMapper;
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,13 +32,16 @@ import static org.mockito.Mockito.*;
 public class DogServiceTest {
 
     DogRepository dogRepository = mock(DogRepository.class);
-    AnimalShelterService animalShelterService;
+    AnimalShelterService animalShelterService = mock(AnimalShelterService.class);
     BestFriendRepository bestFriendRepository = mock(BestFriendRepository.class);
     CatRepository catRepository = mock(CatRepository.class);
     ModelMapper modelMapper = new ModelMapper();
 
     DogService dogService = new DogService(dogRepository, catRepository, animalShelterService, bestFriendRepository, modelMapper);
 
+    private AnimalShelterCommand animalShelterCommand;
+    private AnimalShelterInfo animalShelterInfo;
+    private AnimalShelter animalShelter;
     private Dog dog1;
     private DogCommand dogCommand1;
     private Dog dog2;
@@ -55,9 +59,12 @@ public class DogServiceTest {
 
     @BeforeEach
     void init(){
-        String ldt = "2021-08-13 15:40:00";
+        String ldt = "2021-08-23 15:40:00";
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         LocalDateTime dateTime = LocalDateTime.parse(ldt, formatter);
+        animalShelterCommand = new AnimalShelterCommand("HopeForPaws");
+        animalShelter = new AnimalShelter(1, "HopeForPaws", new ArrayList<>(), new ArrayList<>());
+        animalShelterInfo = new AnimalShelterInfo(1, "HopeForPaws", null, null);
         dog1 = new Dog(1, "Sirion", 6, "Mudi", Gender.SIRE, dateTime, true, false, new BestFriend(1, null, null), new AnimalShelter());
         dog2 = new Dog(2, "Diego", 11, "Maltese", Gender.SIRE, dateTime, true, false, new BestFriend(2, null, null), new AnimalShelter());
         dog3 = new Dog(1, "Digi", 11, "Maltese", Gender.SIRE, dateTime, true, false, new BestFriend(1, null, null), new AnimalShelter());
@@ -65,13 +72,13 @@ public class DogServiceTest {
         dogCommand1 = new DogCommand("Sirion", 6, "Mudi", Gender.SIRE, dateTime, true, false, 1);
         dogCommand2 = new DogCommand("Diego", 11, "Maltese", Gender.SIRE, dateTime, true, false, 1);
         updateCommand1 = new DogCommand("Digi", 11, "Maltese", Gender.SIRE, dateTime, true, false, 1);
-        dogInfo1 = new DogInfo(1, "Sirion", 6, "Mudi", Gender.SIRE, dateTime, true, false, 1);
-        dogInfo2 = new DogInfo(2, "Diego", 11, "Maltese", Gender.SIRE, dateTime, true, false, 1);
-        dogInfo3 = new DogInfo(1, "Digi", 11, "Maltese", Gender.SIRE, dateTime, true, false, 1);
+        dogInfo1 = new DogInfo(1, "Sirion", 6, "Mudi", Gender.SIRE, dateTime, true, false, null);
+        dogInfo2 = new DogInfo(2, "Diego", 11, "Maltese", Gender.SIRE, dateTime, true, false, null);
+        dogInfo3 = new DogInfo(1, "Digi", 11, "Maltese", Gender.SIRE, dateTime, true, false, null);
         catInfo1 = new CatInfo(1, "Lucifer", 10, "Giant", Gender.TOM,
-                dateTime, true, false, 1);
+                dateTime, true, false, null);
         catInfo2 = new CatInfo(2, "Ribizli", 5, "Halfear", Gender.PUSSY,
-                dateTime, true, false, 1);
+                dateTime, true, false, null);
         bestFriendInfo1 = new BestFriendInfo(1, catInfo1, dogInfo1);
         bestFriendInfo2 = new BestFriendInfo(2, catInfo2, dogInfo2);
 
@@ -118,15 +125,17 @@ public class DogServiceTest {
     @Test
     @Transactional
     void testUpdateDog_SuccessfulUpdate(){
-        Dog digi = new Dog(1, "Digi", 11, "Maltese", Gender.SIRE, LocalDateTime.now(), true, false, new BestFriend(1, null, null), new AnimalShelter());
         when(dogRepository.findById(any()))
-                .thenReturn(Optional.of(digi));
+                .thenReturn(Optional.of(dogForUpdate));
         when(dogRepository.update(any()))
-                .thenReturn(digi);
-        when(dogRepository.save(any())).thenReturn(dogForUpdate);
+                .thenReturn(dogForUpdate);
+        when(dogRepository.save(any())).thenReturn(dog1);
+        when(animalShelterService.findByIdForService(any())).thenReturn(animalShelter);
+        DogInfo saved = dogService.saveDog(dogCommand1);
         assertEquals("Digi", dogService.updateDog(1, updateCommand1).getName());
-        verify(dogRepository, times(1)).update(any());
+        verify(dogRepository, times(2)).update(any());
         verify(dogRepository, times(2)).findById(any());
+        verify(dogRepository, times(1)).save(any());
         verifyNoMoreInteractions(dogRepository);
     }
 
@@ -213,16 +222,17 @@ public class DogServiceTest {
         Dog dog1notWalked;
         dog1notWalked = modelMapper.map(dog1Info, Dog.class);
         dog1.setLastWalk(LocalDateTime.now());
-        when(dogRepository.save(any())).thenReturn(dog1notWalked);
+        when(dogRepository.save(dog1notWalked)).thenReturn(dog1notWalked);
+        when(dogRepository.save(dog1)).thenReturn(dog1);
         when(dogRepository.update(any())).thenReturn(dog1notWalked);
-        when(dogRepository.walkMeBoy(any())).thenReturn(dog1);
+        when(dogRepository.findById(1)).thenReturn(Optional.of(dog1));
         DogInfo savedDog = dogService.saveDog(dogCommand1);
         DogInfo walkedDog = dogService.walkTheDog(1);
         assertNotEquals(savedDog.getLastWalk(), walkedDog.getLastWalk());
 
-        verify(dogRepository, times(1)).save(any());
+        verify(dogRepository, times(2)).save(any());
         verify(dogRepository, times(1)).update(any());
-        verify(dogRepository, times(1)).walkMeBoy(1);
+        verify(dogRepository, times(2)).findById(1);
         verifyNoMoreInteractions(dogRepository);
     }
 

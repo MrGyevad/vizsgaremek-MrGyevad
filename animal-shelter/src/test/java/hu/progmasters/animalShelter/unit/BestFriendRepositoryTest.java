@@ -46,7 +46,7 @@ public class BestFriendRepositoryTest {
     }
 
 
-    @Test
+    /*@Test
     @Order(3)
     @Transactional
     void testBecomeBestFriends_SuccessfulSave() {
@@ -61,5 +61,5 @@ public class BestFriendRepositoryTest {
         assertEquals(1, saved.getId());
         assertEquals("Lucifer", saved.getCat().getName());
         assertEquals("Sirion", saved.getDog().getName());
-    }
+    }*/
 }

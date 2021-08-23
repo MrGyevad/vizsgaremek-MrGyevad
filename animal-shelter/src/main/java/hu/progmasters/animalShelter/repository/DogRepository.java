@@ -7,10 +7,8 @@ import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
 @Repository
 public class DogRepository {
@@ -45,21 +43,9 @@ public class DogRepository {
     }
 
     public List<Dog> findAllByGender(Gender gender){
-        return entityManager.createQuery("SELECT d FROM Dog d WHERE d.gender = :gender", Dog.class)
+        return entityManager.createQuery("SELECT d FROM Dog d WHERE d.gender IN :gender", Dog.class)
                 .setParameter("gender", gender)
                 .getResultList();
-    }
-
-    public Dog walkMeBoy(Integer id) throws InterruptedException {
-        Optional<Dog> dogOptional = findById(id);
-        if (dogOptional.isPresent()) {
-            Dog walked = dogOptional.get();
-            TimeUnit.MILLISECONDS.sleep(1);
-            walked.setLastWalk(LocalDateTime.now());
-            return entityManager.merge(walked);
-        } else {
-            return null;
-        }
     }
 
     public List<Dog> findAllAdopted(){

@@ -1,15 +1,14 @@
 package hu.progmasters.animalShelter.unit;
 
 import hu.progmasters.animalShelter.domain.*;
-import hu.progmasters.animalShelter.dto.BestFriendInfo;
-import hu.progmasters.animalShelter.dto.CatCommand;
-import hu.progmasters.animalShelter.dto.CatInfo;
-import hu.progmasters.animalShelter.dto.DogInfo;
+import hu.progmasters.animalShelter.dto.*;
 import hu.progmasters.animalShelter.exception.CatNotFoundException;
 import hu.progmasters.animalShelter.exception.NoBestFriendException;
+import hu.progmasters.animalShelter.repository.AnimalShelterRepository;
 import hu.progmasters.animalShelter.repository.BestFriendRepository;
 import hu.progmasters.animalShelter.repository.CatRepository;
 import hu.progmasters.animalShelter.repository.DogRepository;
+import hu.progmasters.animalShelter.service.AnimalShelterService;
 import hu.progmasters.animalShelter.service.CatService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,6 +19,7 @@ import org.modelmapper.ModelMapper;
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,11 +32,15 @@ public class CatServiceTest {
 
     DogRepository dogRepository = mock(DogRepository.class);
     BestFriendRepository bestFriendRepository = mock(BestFriendRepository.class);
+    AnimalShelterService animalShelterService = mock(AnimalShelterService.class);
     CatRepository catRepository = mock(CatRepository.class);
     ModelMapper modelMapper = new ModelMapper();
 
-    CatService catService = new CatService(catRepository, dogRepository, bestFriendRepository, modelMapper);
+    CatService catService = new CatService(catRepository, dogRepository, bestFriendRepository, animalShelterService, modelMapper);
 
+    private AnimalShelterCommand animalShelterCommand;
+    private AnimalShelterInfo animalShelterInfo;
+    private AnimalShelter animalShelter;
     private Cat cat1;
     private Cat cat2;
     private Cat cat3;
@@ -59,6 +63,9 @@ public class CatServiceTest {
         String ldt = "2021-08-13 15:40:00";
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         LocalDateTime dateTime = LocalDateTime.parse(ldt, formatter);
+        animalShelterCommand = new AnimalShelterCommand("HopeForPaws");
+        animalShelter = new AnimalShelter(1, "HopeForPaws", new ArrayList<>(), new ArrayList<>());
+        animalShelterInfo = new AnimalShelterInfo(1, "HopeForPaws", null, null);
         cat1 = new Cat(1, "Lucifer", 10, "Giant", Gender.TOM,
                 dateTime, true, false, new BestFriend(1, cat1, dog1), new AnimalShelter());
         catForUpdate = new Cat(1, "Luci", 10, "Giant", Gender.TOM,
@@ -70,7 +77,7 @@ public class CatServiceTest {
         dog2 = new Dog(2, "Diego", 11, "Maltese", Gender.SIRE,
                 dateTime, true, false, new BestFriend(2, null, null), new AnimalShelter());
         dogInfo1 = new DogInfo(1, "Sirion", 6, "Mudi", Gender.SIRE,
-                dateTime, true, false, 1);
+                dateTime, true, false, null);
         catCommand1 = new CatCommand("Lucifer", 10, "Giant", Gender.TOM,
                 dateTime, true, false, 1);
         updateCommand1 = new CatCommand("Luci", 10, "Giant", Gender.TOM,
@@ -78,9 +85,9 @@ public class CatServiceTest {
         catCommand2 = new CatCommand("Ribizli", 5, "Halfear", Gender.PUSSY,
                 dateTime, true, false, 1);
         catInfo1 = new CatInfo(1, "Lucifer", 10, "Giant", Gender.TOM,
-                dateTime, true, false, 1);
+                dateTime, true, false, null);
         catInfo2 = new CatInfo(2, "Ribizli", 5, "Halfear", Gender.PUSSY,
-                dateTime, true, false, 1);
+                dateTime, true, false, null);
         cat3 = new Cat(3, "Retek", 4, "Ginger", Gender.TOM,
                 dateTime, true, false, new BestFriend(3, cat3, dog1), new AnimalShelter());
         bestFriendInfo1 = new BestFriendInfo(1, catInfo1, dogInfo1);
@@ -117,6 +124,7 @@ public class CatServiceTest {
                 .thenReturn(cat1);
         when(catRepository.update(any()))
                 .thenReturn(cat1);
+        animalShelterService.saveAnimalShelter(animalShelterCommand);
         CatInfo savedCat= catService.saveCat(catCommand1);
         catInfo1.setLastPlay(savedCat.getLastPlay());
         assertEquals(catInfo1, savedCat);

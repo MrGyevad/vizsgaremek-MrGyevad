@@ -2,6 +2,7 @@ package hu.progmasters.animalShelter.repository;
 
 import hu.progmasters.animalShelter.domain.Cat;
 import hu.progmasters.animalShelter.domain.Gender;
+import hu.progmasters.animalShelter.dto.CatInfo;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -48,21 +49,10 @@ public class CatRepository {
                 .setParameter("gender", gender)
                 .getResultList();
     }
-
-    public Cat playWithMeGirl(Integer id) throws InterruptedException {
-        Optional<Cat> catOptional = findById(id);
-        if (catOptional.isPresent()) {
-            Cat played = catOptional.get();
-            TimeUnit.MILLISECONDS.sleep(1);
-            played.setLastPlay(LocalDateTime.now());
-            return entityManager.merge(played);
-        } else {
-            return null;
-        }
-    }
     public List<Cat> findAllAdopted() {
         return entityManager.createQuery("SELECT c FROM Cat c WHERE c.adopted IN :value", Cat.class)
                 .setParameter("value", true)
                 .getResultList();
     }
+
 }

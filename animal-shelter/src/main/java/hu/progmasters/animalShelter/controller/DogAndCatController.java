@@ -236,7 +236,7 @@ public class DogAndCatController {
             description = "Walked all dogs, who needed a walk")
     @PutMapping("/dog/walk")
     @ResponseStatus(HttpStatus.OK)
-    public void walkWithAllDogs() {
+    public void walkWithAllDogs() throws InterruptedException{
         log.info("HTTP PUT /api/dog/walk - Walk with all dogs");
         dogService.walkAllDogs();
         log.info("HTTP Response OK, Walked with all dogs, who needed to walk.");
@@ -259,11 +259,7 @@ public class DogAndCatController {
         CatInfo bestFriend = new CatInfo();
         log.info("HTTP GET /api/dog/bestfriend - Find dog's best friend");
         String dogName = dogService.findById(id).getName();
-        try {
-            bestFriend = dogService.findBestFriend(id);
-        } catch (CatNotFoundException e) {
-            e.printStackTrace();
-        }
+        bestFriend = dogService.findBestFriend(id);
         log.info(String.format("HTTP Response OK, The best friend of %s is %s", dogName, bestFriend));
         return bestFriend;
     }
@@ -434,7 +430,7 @@ public class DogAndCatController {
             description = "Played with all cats, who needed to play")
     @PutMapping("/cat/play")
     @ResponseStatus(HttpStatus.OK)
-    public void playWithAllCats() {
+    public void playWithAllCats() throws InterruptedException {
         log.info("HTTP PUT /api/cat/play - Play with all cats");
         catService.playWithAllCats();
         log.info("HTTP Response OK, Played with all cats, who needed to play.");

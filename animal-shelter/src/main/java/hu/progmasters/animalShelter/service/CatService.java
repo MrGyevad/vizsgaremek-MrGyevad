@@ -8,7 +8,6 @@ import hu.progmasters.animalShelter.dto.CatCommand;
 import hu.progmasters.animalShelter.dto.CatInfo;
 import hu.progmasters.animalShelter.dto.DogInfo;
 import hu.progmasters.animalShelter.exception.CatNotFoundException;
-import hu.progmasters.animalShelter.exception.DogNotFoundException;
 import hu.progmasters.animalShelter.exception.FriendShipNotFoundException;
 import hu.progmasters.animalShelter.exception.NoBestFriendException;
 import hu.progmasters.animalShelter.repository.CatRepository;
@@ -23,6 +22,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Service
@@ -32,32 +32,32 @@ public class CatService {
     private final CatRepository catRepository;
     private final DogRepository dogRepository;
     private final BestFriendRepository bestFriendRepository;
+    private final AnimalShelterService animalShelterService;
     private final ModelMapper modelMapper;
 
-    public CatService(CatRepository catRepository, DogRepository dogRepository, BestFriendRepository bestFriendRepository, ModelMapper modelMapper) {
+    public CatService(CatRepository catRepository, DogRepository dogRepository, BestFriendRepository bestFriendRepository, AnimalShelterService animalShelterService, ModelMapper modelMapper) {
         this.catRepository = catRepository;
         this.dogRepository = dogRepository;
         this.bestFriendRepository = bestFriendRepository;
+        this.animalShelterService = animalShelterService;
         this.modelMapper = modelMapper;
     }
 
     public CatInfo saveCat(CatCommand command) {
         Cat toSave = modelMapper.map(command, Cat.class);
+        toSave.setAnimalShelter(animalShelterService.findByIdForService(command.getAnimalShelterId()));
         Cat saved = catRepository.save(toSave);
-        Cat updated;
-        if (bestFriendRepository.findFriendshipById(saved.getId()).isPresent()){
+        if (bestFriendRepository.findFriendshipById(saved.getId()).isPresent()) {
             BestFriend bestFriend = bestFriendRepository.findFriendshipById(saved.getId()).get();
             saved.setBestFriend(bestFriend);
             bestFriend.setCat(saved);
             bestFriendRepository.save(bestFriend);
-            updated = catRepository.update(saved);
         } else {
             BestFriend newBestFriend = new BestFriend(saved.getId(), saved, null);
             saved.setBestFriend(newBestFriend);
             bestFriendRepository.save(newBestFriend);
-            updated = catRepository.update(saved);
         }
-        return modelMapper.map(updated, CatInfo.class);
+        return modelMapper.map(catRepository.update(saved), CatInfo.class);
     }
 
     public CatInfo updateCat(Integer id, CatCommand command) {
@@ -71,6 +71,9 @@ public class CatService {
             toUpdate.setGender(command.getGender());
             toUpdate.setHasWaterAndFood(command.isHasWaterAndFood());
             toUpdate.setLastPlay(command.getLastPlay());
+            if (animalShelterService.findByIdForService(command.getAnimalShelterId()) != null) {
+                animalShelterService.findByIdForService(command.getAnimalShelterId()).getCatList().add(toUpdate);
+            }
         } else {
             throw new CatNotFoundException("Cat not found.", id);
         }
@@ -107,10 +110,10 @@ public class CatService {
     public void catAdopted(Integer id) {
         Optional<Cat> toAdopt = catRepository.findById(id);
         Dog bestFriend;
-        if (toAdopt.isPresent()){
+        if (toAdopt.isPresent()) {
             toAdopt.get().setAdopted(true);
             bestFriend = toAdopt.get().getBestFriend().getDog();
-            if (bestFriend != null){
+            if (bestFriend != null) {
                 bestFriend.setAdopted(true);
             } else throw new NoBestFriendException("Sadly, this cat has no best friend.", id);
         } else throw new CatNotFoundException("Cat not found.", id);
@@ -118,7 +121,7 @@ public class CatService {
 
     public void catDeceased(Integer id) {
         Optional<Cat> toDeleteOptional = catRepository.findById(id);
-        if (toDeleteOptional.isPresent()){
+        if (toDeleteOptional.isPresent()) {
             Cat toDelete = toDeleteOptional.get();
             catRepository.catDeceased(toDelete);
         } else {
@@ -139,18 +142,22 @@ public class CatService {
     }
 
     public CatInfo playWithCat(Integer id) throws InterruptedException {
-        Cat played = catRepository.playWithMeGirl(id);
-        if (played != null){
-        return modelMapper.map(played, CatInfo.class);
+        Cat cat;
+        if (catRepository.findById(id).isPresent()) {
+            cat = catRepository.findById(id).get();
+            TimeUnit.MILLISECONDS.sleep(1);
+            cat.setLastPlay(LocalDateTime.now());
+            return modelMapper.map(cat, CatInfo.class);
         } else {
             throw new CatNotFoundException("Cat not found.", id);
         }
     }
 
-    public void playWithAllCats() {
+    public void playWithAllCats() throws InterruptedException {
         for (Cat cat : catRepository.findAll()) {
             long hours = ChronoUnit.HOURS.between(cat.getLastPlay(), LocalDateTime.now());
             if (hours > 6) {
+                TimeUnit.MILLISECONDS.sleep(1);
                 cat.setLastPlay(LocalDateTime.now());
             }
         }
@@ -158,12 +165,12 @@ public class CatService {
 
     public DogInfo findBestFriend(Integer id) {
         Optional<Cat> found = catRepository.findById(id);
-        if (found.isPresent()){
-            if (found.get().getBestFriend() != null){
+        if (found.isPresent()) {
+            if (found.get().getBestFriend() != null) {
                 if (found.get().getBestFriend().getDog() != null) {
                     return modelMapper.map(found.get().getBestFriend().getDog(), DogInfo.class);
-            } else throw new NoBestFriendException("Sadly, this animal has no best friend.", id);
-                } else throw new FriendShipNotFoundException("Friendship not found");
+                } else throw new NoBestFriendException("Sadly, this animal has no best friend.", id);
+            } else throw new FriendShipNotFoundException("Friendship not found");
         } else throw new CatNotFoundException("Cat not found.", id);
     }
 }

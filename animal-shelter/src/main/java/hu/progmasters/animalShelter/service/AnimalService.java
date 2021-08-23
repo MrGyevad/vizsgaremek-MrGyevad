@@ -53,8 +53,10 @@ public class AnimalService {
 
                 Optional<BestFriend> toSave = bestFriendRepository.findFriendshipById(dogOptional.get().getBestFriend().getId());
                 if (toSave.isPresent()){
-                BestFriend saved = bestFriendRepository.becomeBestFriends(toSave.get(), catOptional.get(), dogOptional.get());
-                return modelMapper.map(saved, BestFriendInfo.class);
+                    toSave.get().setCat(catOptional.get());
+                    toSave.get().setDog(dogOptional.get());
+                    bestFriendRepository.save(toSave.get());
+                return modelMapper.map(toSave, BestFriendInfo.class);
                 } else throw new FriendShipNotFoundException("Friendship not found.");
             } else throw new DogNotFoundException("Dog not found.", dogId);
         } else throw new CatNotFoundException("Cat not found.", catId);

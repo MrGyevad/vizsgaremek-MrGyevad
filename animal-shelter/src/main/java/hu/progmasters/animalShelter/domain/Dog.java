@@ -3,6 +3,7 @@ package hu.progmasters.animalShelter.domain;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -24,16 +25,10 @@ public class Dog {
     private LocalDateTime lastWalk;
     private boolean hasWaterAndFood;
     private boolean adopted;
-    @OneToOne(mappedBy = "dog", cascade = CascadeType.ALL)
+    @ToString.Exclude
+    @OneToOne(mappedBy = "dog", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private BestFriend bestFriend;
+    @ToString.Exclude
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private AnimalShelter animalShelter;
-
-    public AnimalShelter getAnimalShelter() {
-        return animalShelter;
-    }
-
-    public void setAnimalShelter(AnimalShelter animalShelter) {
-        this.animalShelter = animalShelter;
-    }
 }
