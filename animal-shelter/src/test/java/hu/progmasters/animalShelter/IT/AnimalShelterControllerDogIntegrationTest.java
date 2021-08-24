@@ -4,8 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import hu.progmasters.animalShelter.domain.Gender;
 import hu.progmasters.animalShelter.dto.*;
-import hu.progmasters.animalShelter.exception.CatNotFoundException;
-import hu.progmasters.animalShelter.exception.DogNotFoundException;
 import hu.progmasters.animalShelter.repository.AnimalShelterRepository;
 import hu.progmasters.animalShelter.repository.BestFriendRepository;
 import hu.progmasters.animalShelter.repository.CatRepository;
@@ -25,7 +23,6 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
@@ -74,29 +71,15 @@ public class AnimalShelterControllerDogIntegrationTest {
     private static DogInfo dogInfo1;
     private static CatCommand catCommand1;
     private static CatInfo catInfo1;
-    private static BestFriendInfo bestFriendInfo1;
     private static DogCommand dogCommand2;
     private static DogInfo dogInfo2;
-    private static DogCommand dogCommand3;
-    private static DogInfo dogInfo3;
-    private static CatCommand catCommand2;
-    private static CatInfo catInfo2;
-    private static CatCommand catCommand3;
-    private static CatInfo catInfo3;
-    private static BestFriendInfo bestFriendInfo2;
-    private static BestFriendInfo bestFriendInfo3;
-    private static BestFriendInfo updatedBestFriendInfo1;
     private static DogCommand updateDogCommand1;
     private static DogInfo updatedDogInfo1;
-    private static CatInfo updatedCatInfo1;
-    private static CatCommand updateCatCommand1;
-    private static DogNotFoundException dogNotFoundException;
-    private static CatNotFoundException catNotFoundException;
 
     @BeforeEach
     void init(){
 
-        String ldt = "2021-08-23 17:40:00";
+        String ldt = "2021-08-24 17:40:00";
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         LocalDateTime dateTime = LocalDateTime.parse(ldt, formatter);
         animalShelterCommand = new AnimalShelterCommand("HopeForPaws");
@@ -109,36 +92,14 @@ public class AnimalShelterControllerDogIntegrationTest {
                 true, false, 1);
         dogInfo2 = new DogInfo(2, "Réka", 15, "Vizsla", Gender.BITCH, dateTime,
                 true, false, null);
-        dogCommand3 = new DogCommand("Diego", 11, "Maltese", Gender.SIRE, dateTime,
-                true, false, 1);
-        dogInfo3 = new DogInfo(3, "Diego", 11, "Maltese", Gender.SIRE, dateTime,
-                true, false, null);
         catCommand1 = new CatCommand("Lucifer", 10, "Giant", Gender.TOM,
                 dateTime, true, false, 1);
         catInfo1 = new CatInfo(1, "Lucifer", 10, "Giant", Gender.TOM,
                 dateTime, true, false, null);
-        catCommand2 = new CatCommand("Ribizli", 5, "Halfear", Gender.PUSSY,
-                dateTime, true, false, 1);
-        catInfo2 = new CatInfo(2, "Ribizli", 5, "Halfear", Gender.PUSSY,
-                dateTime, true, false, null);
-        catCommand3 = new CatCommand("Retek", 4, "Ginger", Gender.TOM,
-                dateTime, true, false, 1);
-        catInfo3 = new CatInfo(3, "Retek", 4, "Ginger", Gender.TOM,
-                dateTime, true, false, null);
-        bestFriendInfo1 = new BestFriendInfo(1, catInfo1, dogInfo1);
-        bestFriendInfo2 = new BestFriendInfo(2, catInfo2, dogInfo2);
-        bestFriendInfo3 = new BestFriendInfo(3, catInfo3, dogInfo3);
-        updatedBestFriendInfo1 = new BestFriendInfo(1, catInfo1, updatedDogInfo1);
         updateDogCommand1 = new DogCommand("Réka", 15, "Vizsla", Gender.BITCH, dateTime,
                 true, false, 1);
         updatedDogInfo1 = new DogInfo(1, "Réka", 15, "Vizsla", Gender.BITCH, dateTime,
                 true, false, null);
-        updateCatCommand1 = new CatCommand("Retek", 4, "Ginger", Gender.TOM,
-                dateTime, true, false, 1);
-        updatedCatInfo1 = new CatInfo(1, "Retek", 4, "Ginger", Gender.TOM,
-                dateTime, true, false, null);
-        dogNotFoundException = new DogNotFoundException("Dog not found.", 420);
-        catNotFoundException = new CatNotFoundException("Cat not found.", 420);
     }
 
     @Test
@@ -304,7 +265,7 @@ public class AnimalShelterControllerDogIntegrationTest {
         assertThat(dogService.findAllDogs()).hasSize(1).containsExactly(dogInfo1);
     }
 
-   /* @Test
+    @Test
     void testDogAdopted_successfulAdoption() throws Exception {
         mockMvc.perform(post("/api/animalShelter")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -335,7 +296,7 @@ public class AnimalShelterControllerDogIntegrationTest {
 
         assertThat(dogService.findAllDogs()).isEmpty();
         assertThat(catService.findAllCats()).isEmpty();
-    }*/
+    }
 
     @Test
     void testDogDeceased_successfulDelete() throws Exception{
@@ -401,7 +362,7 @@ public class AnimalShelterControllerDogIntegrationTest {
                 .andExpect(content().json(objectMapper.writeValueAsString(List.of())));
     }
 
-   /* @Test
+    @Test
     void testWhoNeedsToWalk_twoInTheListOneNeedsAWalk() throws Exception{
         mockMvc.perform(post("/api/animalShelter")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -434,7 +395,7 @@ public class AnimalShelterControllerDogIntegrationTest {
 
         assertThat(dogService.findAllDogs()).hasSize(2).containsExactly(dogInfo1, dogInfo2);
         assertThat(dogService.whoNeedsAWalk()).hasSize(1).containsExactly(dogInfo2);
-    }*/
+    }
 
     @Test
     void testWalkWithMe_dogWalked() throws Exception{
@@ -490,7 +451,7 @@ public class AnimalShelterControllerDogIntegrationTest {
                 .andExpect(content().json(objectMapper.writeValueAsString(List.of())));
     }
 
-    /*@Test
+    @Test
     void testFindAllDogsByGender_oneBitchOneSire() throws Exception{
         mockMvc.perform(post("/api/animalShelter")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -584,5 +545,5 @@ public class AnimalShelterControllerDogIntegrationTest {
         mockMvc.perform(get("/api/dog/bestFriend/1"))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(catInfo1)));
-    }*/
+    }
 }

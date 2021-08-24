@@ -1,22 +1,15 @@
 package hu.progmasters.animalShelter.service;
 
-import hu.progmasters.animalShelter.domain.BestFriend;
-import hu.progmasters.animalShelter.domain.Cat;
-import hu.progmasters.animalShelter.domain.Dog;
-import hu.progmasters.animalShelter.domain.Gender;
-import hu.progmasters.animalShelter.dto.AnimalShelterInfo;
+import hu.progmasters.animalShelter.domain.*;
 import hu.progmasters.animalShelter.dto.CatInfo;
 import hu.progmasters.animalShelter.dto.DogCommand;
 import hu.progmasters.animalShelter.dto.DogInfo;
 import hu.progmasters.animalShelter.exception.DogNotFoundException;
 import hu.progmasters.animalShelter.exception.FriendShipNotFoundException;
 import hu.progmasters.animalShelter.exception.NoBestFriendException;
-import hu.progmasters.animalShelter.repository.CatRepository;
 import hu.progmasters.animalShelter.repository.DogRepository;
 import hu.progmasters.animalShelter.repository.BestFriendRepository;
-import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.spi.MappingContext;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -33,18 +26,15 @@ import java.util.stream.Collectors;
 public class DogService {
 
     private final DogRepository dogRepository;
-    private final CatRepository catRepository;
     private final AnimalShelterService animalShelterService;
     private final BestFriendRepository bestFriendRepository;
     private final ModelMapper modelMapper;
 
-    public DogService(DogRepository dogRepository, CatRepository catRepository, AnimalShelterService animalShelterService, BestFriendRepository bestFriendRepository, ModelMapper modelMapper) {
+    public DogService(DogRepository dogRepository, AnimalShelterService animalShelterService, BestFriendRepository bestFriendRepository, ModelMapper modelMapper) {
         this.dogRepository = dogRepository;
-        this.catRepository = catRepository;
         this.animalShelterService = animalShelterService;
         this.bestFriendRepository = bestFriendRepository;
         this.modelMapper = modelMapper;
-
     }
 
     public DogInfo saveDog(DogCommand command) {
@@ -60,8 +50,7 @@ public class DogService {
             BestFriend newBestFriend = new BestFriend(saved.getId(), null, saved);
             saved.setBestFriend(newBestFriend);
             bestFriendRepository.save(newBestFriend);
-        }
-        return modelMapper.map(dogRepository.update(saved), DogInfo.class);
+        } return modelMapper.map(dogRepository.update(saved), DogInfo.class);
     }
 
     public DogInfo updateDog(Integer id, DogCommand command) {
@@ -78,9 +67,7 @@ public class DogService {
             if (animalShelterService.findByIdForService(command.getAnimalShelterId()) != null){
             animalShelterService.findByIdForService(command.getAnimalShelterId()).getDogList().add(dogToUpdate);
             }
-        } else {
-            throw new DogNotFoundException("Dog not found.", id);
-        }
+        } else { throw new DogNotFoundException("Dog not found.", id);}
         return modelMapper.map(dogRepository.update(dogToUpdate), DogInfo.class);
     }
 
@@ -96,9 +83,7 @@ public class DogService {
         Optional<Dog> found = dogRepository.findById(id);
         if (found.isPresent()){
             return modelMapper.map(found.get(), DogInfo.class);
-        } else {
-            throw new DogNotFoundException("Dog not found.", id);
-        }
+        } else { throw new DogNotFoundException("Dog not found.", id);}
     }
 
     public List<DogInfo> findAllByGender(Gender gender) {
@@ -122,9 +107,7 @@ public class DogService {
         if (toDeleteOptional.isPresent()){
             Dog toDelete = toDeleteOptional.get();
             dogRepository.dogDeceased(toDelete);
-        } else {
-            throw new DogNotFoundException("Dog not found.", id);
-        }
+        } else throw new DogNotFoundException("Dog not found.", id);
     }
 
     public List<DogInfo> whoNeedsAWalk() {
@@ -135,8 +118,7 @@ public class DogService {
             if (hours > 6) {
                 needWalk.add(dog);
             }
-        }
-        return needWalk.stream().map(dog -> modelMapper.map(dog, DogInfo.class)).collect(Collectors.toList());
+        } return needWalk.stream().map(dog -> modelMapper.map(dog, DogInfo.class)).collect(Collectors.toList());
     }
 
     public DogInfo walkTheDog(Integer id) throws InterruptedException {
@@ -145,11 +127,8 @@ public class DogService {
             dog = dogRepository.findById(id).get();
             TimeUnit.MILLISECONDS.sleep(1);
             dog.setLastWalk(LocalDateTime.now());
-
             return modelMapper.map(dogRepository.save(dog), DogInfo.class);
-        } else {
-            throw new DogNotFoundException("Dog not found.", id);
-        }
+        } else throw new DogNotFoundException("Dog not found.", id);
     }
 
 
@@ -172,6 +151,5 @@ public class DogService {
                 } else throw new NoBestFriendException("Sadly, this animal has no best friend.", id);
             } else throw new FriendShipNotFoundException("Friendship not found");
         } else throw new DogNotFoundException("Dog not found.", id);
-
     }
 }

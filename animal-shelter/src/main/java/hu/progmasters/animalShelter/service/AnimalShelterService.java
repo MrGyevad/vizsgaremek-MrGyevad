@@ -35,17 +35,13 @@ public class AnimalShelterService {
         Optional<AnimalShelter> found = animalShelterRepository.findById(id);
         if (found.isPresent()){
             return modelMapper.map(found.get(), AnimalShelterInfo.class);
-        } else {
-            throw new AnimalShelterNotFoundException("Shelter not found", id);
-        }
+        } else throw new AnimalShelterNotFoundException("Shelter not found", id);
     }
     public AnimalShelter findByIdForService(Integer id){
         Optional<AnimalShelter> found = animalShelterRepository.findById(id);
         if (found.isPresent()){
             return found.get();
-        } else {
-            throw new AnimalShelterNotFoundException("Shelter not found", id);
-        }
+        } else throw new AnimalShelterNotFoundException("Shelter not found", id);
     }
 
     public List<AnimalShelterInfo> findAll(){
@@ -60,9 +56,7 @@ public class AnimalShelterService {
         if (animalShelterRepository.findById(id).isPresent()){
             toUpdate = animalShelterRepository.findById(id).get();
             toUpdate.setName(command.getName());
-        } else {
-            throw new AnimalShelterNotFoundException("Shelter not found", id);
-        }
+        } else throw new AnimalShelterNotFoundException("Shelter not found", id);
         return modelMapper.map(animalShelterRepository.update(toUpdate), AnimalShelterInfo.class);
     }
 
@@ -73,9 +67,5 @@ public class AnimalShelterService {
             animalShelterRepository.delete(toDelete);
         }
     }
-
-
-
-
 }
 

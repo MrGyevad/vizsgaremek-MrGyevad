@@ -9,7 +9,6 @@ import hu.progmasters.animalShelter.dto.DogInfo;
 import hu.progmasters.animalShelter.exception.CatNotFoundException;
 import hu.progmasters.animalShelter.exception.DogNotFoundException;
 import hu.progmasters.animalShelter.exception.FriendShipNotFoundException;
-import hu.progmasters.animalShelter.exception.NoBestFriendException;
 import hu.progmasters.animalShelter.repository.BestFriendRepository;
 import hu.progmasters.animalShelter.repository.CatRepository;
 import hu.progmasters.animalShelter.repository.DogRepository;
@@ -50,7 +49,6 @@ public class AnimalService {
         Optional<Dog> dogOptional = dogRepository.findById(dogId);
         if (catOptional.isPresent()){
             if (dogOptional.isPresent()){
-
                 Optional<BestFriend> toSave = bestFriendRepository.findFriendshipById(dogOptional.get().getBestFriend().getId());
                 if (toSave.isPresent()){
                     toSave.get().setCat(catOptional.get());

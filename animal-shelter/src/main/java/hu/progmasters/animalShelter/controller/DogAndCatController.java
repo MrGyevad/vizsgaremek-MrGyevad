@@ -3,13 +3,13 @@ package hu.progmasters.animalShelter.controller;
 import hu.progmasters.animalShelter.domain.Gender;
 import hu.progmasters.animalShelter.dto.*;
 import hu.progmasters.animalShelter.exception.AnimalShelterError;
-import hu.progmasters.animalShelter.exception.CatNotFoundException;
 import hu.progmasters.animalShelter.exception.DogNotFoundException;
 import hu.progmasters.animalShelter.exception.ValidationError;
 import hu.progmasters.animalShelter.service.AnimalService;
 import hu.progmasters.animalShelter.service.CatService;
 import hu.progmasters.animalShelter.service.DogService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -32,7 +32,6 @@ public class DogAndCatController {
     private final DogService dogService;
     private final CatService catService;
     private final AnimalService animalService;
-
 
     public DogAndCatController(DogService dogService, CatService catService, AnimalService animalService) {
         this.dogService = dogService;
@@ -94,10 +93,12 @@ public class DogAndCatController {
             @ApiResponse(responseCode = "400",
                     description = "Bad request, validation error.",
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            array = @ArraySchema(schema = @Schema(implementation = AnimalShelterError.class))))})
+                            schema = @Schema(implementation = ValidationError.class)))})
     @PostMapping("/dog")
     @ResponseStatus(HttpStatus.CREATED)
-    public DogInfo saveDog(@Valid @RequestBody DogCommand command) {
+    public DogInfo saveDog(@Parameter(description = "Dog creation command, please use LocalDateTime " +
+            "format: yyyy-MM-dd@HH:mm:ss")
+                               @Valid @RequestBody DogCommand command) {
         log.info("HTTP POST /api/dog - Save a dog");
         DogInfo toSave = dogService.saveDog(command);
         log.info(String.format("HTTP Response: CREATED, Body: %s", toSave));
@@ -117,7 +118,7 @@ public class DogAndCatController {
                             array = @ArraySchema(schema = @Schema(implementation = AnimalShelterError.class))))})
     @GetMapping("/dog/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public DogInfo findDogById(@PathVariable("id") Integer id) {
+    public DogInfo findDogById(@Parameter(example = "1") @PathVariable("id") Integer id) {
         log.info(String.format("HTTP GET /api/dog/%s - Find dog by ID", id));
         DogInfo found = dogService.findById(id);
         log.info(String.format("HTTP Response: FOUND, Body: %s", found));
@@ -144,7 +145,8 @@ public class DogAndCatController {
                             schema = @Schema(implementation = ValidationError.class)))})
     @PutMapping("/dog/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public DogInfo updateDog(@PathVariable("id") Integer id, @Valid @RequestBody DogCommand command) {
+    public DogInfo updateDog(@Parameter(description = "Cat creation command, please use LocalDateTime" +
+            " format: yyyy-MM-dd@HH:mm:ss") @PathVariable("id") Integer id, @Valid @RequestBody DogCommand command) {
         log.info(String.format("HTTP PUT /api/dog/%s - Update dog", id));
         DogInfo updated = dogService.updateDog(id, command);
         log.info("HTTP Response: OK, Dog updated.");
@@ -161,7 +163,7 @@ public class DogAndCatController {
                             schema = @Schema(implementation = AnimalShelterError.class)))})
     @PutMapping("/dog/adopt/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public void dogAdopted(@PathVariable("id") Integer id) {
+    public void dogAdopted(@Parameter(example = "1") @PathVariable("id") Integer id) {
         log.info(String.format("HTTP PUT /api/dog/adopt/%s - Adopt dog", id));
         dogService.dogAdopted(id);
         log.info("HTTP Response: OK, Dog adopted from the shelter.");
@@ -177,7 +179,7 @@ public class DogAndCatController {
                             schema = @Schema(implementation = AnimalShelterError.class)))})
     @DeleteMapping("/dog/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public void dogDeceased(@PathVariable("id") Integer id) {
+    public void dogDeceased(@Parameter(example = "1") @PathVariable("id") Integer id) {
         log.info(String.format("HTTP DELETE /api/dog/%s - Delete dog from repository", id));
         dogService.dogDeceased(id);
         log.info("HTTP Response: OK, The dog has deceased:");
@@ -210,7 +212,7 @@ public class DogAndCatController {
                             schema = @Schema(implementation = AnimalShelterError.class)))})
     @PutMapping("/dog/walk/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public DogInfo walkWithMe(@PathVariable("id") Integer id) throws InterruptedException {
+    public DogInfo walkWithMe(@Parameter(example = "1") @PathVariable("id") Integer id) throws InterruptedException {
         log.info(String.format("HTTP PUT /api/dog/walk/%s - Walk dog with ID", id));
         DogInfo walked = dogService.walkTheDog(id);
         log.info(String.format("HTTP Response OK, This dog walked: %s", walked));
@@ -224,7 +226,7 @@ public class DogAndCatController {
                     array = @ArraySchema(schema = @Schema(implementation = DogInfo.class))))
     @GetMapping("/dog/gender/{gender}")
     @ResponseStatus(HttpStatus.OK)
-    public List<DogInfo> findAllDogsByGender(@PathVariable("gender") Gender gender) {
+    public List<DogInfo> findAllDogsByGender(@Parameter(example = "1") @PathVariable("gender") Gender gender) {
         log.info("HTTP GET /api/dog/gender - Find dogs by gender");
         List<DogInfo> genderList = dogService.findAllByGender(gender);
         log.info(String.format("HTTP Response OK, These are the %s dogs: %s", gender, genderList));
@@ -236,7 +238,7 @@ public class DogAndCatController {
             description = "Walked all dogs, who needed a walk")
     @PutMapping("/dog/walk")
     @ResponseStatus(HttpStatus.OK)
-    public void walkWithAllDogs() throws InterruptedException{
+    public void walkWithAllDogs() throws InterruptedException {
         log.info("HTTP PUT /api/dog/walk - Walk with all dogs");
         dogService.walkAllDogs();
         log.info("HTTP Response OK, Walked with all dogs, who needed to walk.");
@@ -247,16 +249,15 @@ public class DogAndCatController {
             @ApiResponse(responseCode = "200",
                     description = "Found the best friend of the dog",
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = CatInfo.class))
-            ),
+                            schema = @Schema(implementation = CatInfo.class))),
             @ApiResponse(responseCode = "404",
                     description = "Dog not found, or has no best friend",
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
                             schema = @Schema(implementation = AnimalShelterError.class)))})
     @GetMapping("/dog/bestFriend/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public CatInfo findDogsBestFriend(@PathVariable("id") Integer id) {
-        CatInfo bestFriend = new CatInfo();
+    public CatInfo findDogsBestFriend(@Parameter(example = "1") @PathVariable("id") Integer id) {
+        CatInfo bestFriend;
         log.info("HTTP GET /api/dog/bestfriend - Find dog's best friend");
         String dogName = dogService.findById(id).getName();
         bestFriend = dogService.findBestFriend(id);
@@ -288,10 +289,12 @@ public class DogAndCatController {
             @ApiResponse(responseCode = "400",
                     description = "Bad request, validation error.",
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            array = @ArraySchema(schema = @Schema(implementation = AnimalShelterError.class))))})
+                            array = @ArraySchema(schema = @Schema(implementation = ValidationError.class))))})
     @PostMapping("/cat")
     @ResponseStatus(HttpStatus.CREATED)
-    public CatInfo saveCat(@Valid @RequestBody CatCommand command) {
+    public CatInfo saveCat(@Parameter(description = "Cat creation command, please use LocalDateTime" +
+            " format: yyyy-MM-dd@HH:mm:ss")
+                               @Valid @RequestBody CatCommand command) {
         log.info("HTTP POST /api/cat - Save a cat");
         CatInfo toSave = catService.saveCat(command);
         log.info(String.format("HTTP Response: CREATED, Body: %s", toSave));
@@ -311,7 +314,7 @@ public class DogAndCatController {
                             array = @ArraySchema(schema = @Schema(implementation = AnimalShelterError.class))))})
     @GetMapping("/cat/{id}")
     @ResponseStatus(HttpStatus.FOUND)
-    public CatInfo findCatById(@PathVariable("id") Integer id) {
+    public CatInfo findCatById(@Parameter(example = "1") @PathVariable("id") Integer id) {
         log.info(String.format("HTTP GET /api/cat/%s - Find cat by ID", id));
         CatInfo found = catService.findById(id);
         log.info(String.format("HTTP Response: FOUND, Body: %s", found));
@@ -338,7 +341,8 @@ public class DogAndCatController {
                             schema = @Schema(implementation = ValidationError.class)))})
     @PutMapping("/cat/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public CatInfo updateCat(@PathVariable Integer id, @Valid @RequestBody CatCommand command) {
+    public CatInfo updateCat(@Parameter(description = "Cat creation command, please use LocalDateTime" +
+            " format: yyyy-MM-dd@HH:mm:ss") @PathVariable Integer id, @Valid @RequestBody CatCommand command) {
         log.info(String.format("HTTP PUT /api/cat/%s - Update cat with info %s", id, command));
         CatInfo updated = catService.updateCat(id, command);
         log.info(String.format("HTTP Response: OK, Body: %s", updated));
@@ -355,7 +359,7 @@ public class DogAndCatController {
                             schema = @Schema(implementation = AnimalShelterError.class)))})
     @PutMapping("/cat/adopt/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public void catAdopted(@PathVariable("id") Integer id) {
+    public void catAdopted(@Parameter(example = "1") @PathVariable("id") Integer id) {
         log.info(String.format("HTTP PUT /api/cat/adopt/%s - Adopt cat", id));
         catService.catAdopted(id);
         log.info("HTTP Response: OK, Cat adopted from the shelter.");
@@ -371,7 +375,7 @@ public class DogAndCatController {
                             schema = @Schema(implementation = AnimalShelterError.class)))})
     @DeleteMapping("/cat/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public void catDeceased(@PathVariable("id") Integer id) {
+    public void catDeceased(@Parameter(example = "1") @PathVariable("id") Integer id) {
         log.info(String.format("HTTP DELETE /api/cat/%s - Delete cat from repository", id));
         catService.catDeceased(id);
         log.info("HTTP Response: OK, The cat has deceased:");
@@ -404,7 +408,7 @@ public class DogAndCatController {
                             schema = @Schema(implementation = AnimalShelterError.class)))})
     @PutMapping("/cat/play/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public CatInfo playWithMe(@PathVariable("id") Integer id) throws InterruptedException {
+    public CatInfo playWithMe(@Parameter(example = "1") @PathVariable("id") Integer id) throws InterruptedException {
         log.info(String.format("HTTP PUT /api/cat/play/%s - Play cat with ID", id));
         CatInfo played = catService.playWithCat(id);
         log.info(String.format("HTTP Response OK, This cat played: %s", played));
@@ -418,7 +422,7 @@ public class DogAndCatController {
                     array = @ArraySchema(schema = @Schema(implementation = CatInfo.class))))
     @GetMapping("/cat/gender/{gender}")
     @ResponseStatus(HttpStatus.OK)
-    public List<CatInfo> findAllCatsByGender(@PathVariable("gender") Gender gender) {
+    public List<CatInfo> findAllCatsByGender(@Parameter(example = "1") @PathVariable("gender") Gender gender) {
         log.info("HTTP GET /api/cat/gender - Find cats by gender");
         List<CatInfo> genderList = catService.findAllByGender(gender);
         log.info(String.format("HTTP Response OK, These are the %s cats: %s", gender, genderList));
@@ -441,15 +445,14 @@ public class DogAndCatController {
             @ApiResponse(responseCode = "200",
                     description = "Found the best friend of the cat",
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = DogInfo.class))
-            ),
+                            schema = @Schema(implementation = DogInfo.class))),
             @ApiResponse(responseCode = "404",
                     description = "Cat not found, or has no best friend",
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
                             schema = @Schema(implementation = AnimalShelterError.class)))})
     @GetMapping("/cat/bestfriend/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public DogInfo findCatsBestFriend(@PathVariable("id") Integer id) {
+    public DogInfo findCatsBestFriend(@Parameter(example = "1") @PathVariable("id") Integer id) {
         DogInfo bestFriend = catService.findBestFriend(id);
         log.info(String.format("HTTP GET /api/cat/bestfriend/%s - Find cat's best friend", id));
         String catName = catService.findById(id).getName();
@@ -467,20 +470,17 @@ public class DogAndCatController {
             @ApiResponse(responseCode = "200",
                     description = "The cat and the dog became best friends",
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = BestFriendInfo.class))
-            ),
+                            schema = @Schema(implementation = BestFriendInfo.class))),
             @ApiResponse(responseCode = "404",
                     description = "Cat or dog not found",
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
                             schema = @Schema(implementation = AnimalShelterError.class)))})
     @PutMapping("/{catId}/{dogId}")
     @ResponseStatus(HttpStatus.OK)
-    public BestFriendInfo becomeBestFriends(@PathVariable("catId") Integer catId, @PathVariable("dogId") Integer dogId){
+    public BestFriendInfo becomeBestFriends(@Parameter(example = "1/1") @PathVariable("catId") Integer catId, @PathVariable("dogId") Integer dogId) {
         log.info(String.format("HTTP PUT /api/%s/%s - Cat and dog become best friends", catId, dogId));
         BestFriendInfo bestFriendInfo = animalService.becomeBestFriends(catId, dogId);
         log.info(String.format("HTTP Response OK, Cat with ID: %s, and dog with ID: %s became best friends.", catId, dogId));
         return bestFriendInfo;
-
     }
-
 }

@@ -12,8 +12,6 @@ import org.springframework.test.annotation.DirtiesContext;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -70,7 +68,10 @@ public class CatRepositoryTest {
         LocalDateTime cat1LastPlay = cat1.getLastPlay();
         assertTrue(catRepository.findAll().isEmpty());
         catRepository.save(cat1);
-        Cat found = catRepository.findById(1).get();
+        Cat found = new Cat();
+        if (catRepository.findById(1).isPresent()){
+        found = catRepository.findById(1).get();
+        }
         assertEquals(1, catRepository.findAll().size());
         assertEquals(1, found.getId());
         assertEquals(10, found.getAge());

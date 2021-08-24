@@ -1,5 +1,6 @@
 package hu.progmasters.animalShelter.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -22,6 +23,7 @@ public class Dog {
     private String breed;
     @Enumerated(EnumType.STRING)
     private Gender gender;
+    @JsonFormat(pattern = "yyyy-MM-dd@HH:mm:ss")
     private LocalDateTime lastWalk;
     private boolean hasWaterAndFood;
     private boolean adopted;

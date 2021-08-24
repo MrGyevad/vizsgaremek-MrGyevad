@@ -1,9 +1,6 @@
 package hu.progmasters.animalShelter.service;
 
-import hu.progmasters.animalShelter.domain.BestFriend;
-import hu.progmasters.animalShelter.domain.Cat;
-import hu.progmasters.animalShelter.domain.Dog;
-import hu.progmasters.animalShelter.domain.Gender;
+import hu.progmasters.animalShelter.domain.*;
 import hu.progmasters.animalShelter.dto.CatCommand;
 import hu.progmasters.animalShelter.dto.CatInfo;
 import hu.progmasters.animalShelter.dto.DogInfo;
@@ -12,7 +9,6 @@ import hu.progmasters.animalShelter.exception.FriendShipNotFoundException;
 import hu.progmasters.animalShelter.exception.NoBestFriendException;
 import hu.progmasters.animalShelter.repository.CatRepository;
 import hu.progmasters.animalShelter.repository.BestFriendRepository;
-import hu.progmasters.animalShelter.repository.DogRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
@@ -30,14 +26,12 @@ import java.util.stream.Collectors;
 public class CatService {
 
     private final CatRepository catRepository;
-    private final DogRepository dogRepository;
     private final BestFriendRepository bestFriendRepository;
     private final AnimalShelterService animalShelterService;
     private final ModelMapper modelMapper;
 
-    public CatService(CatRepository catRepository, DogRepository dogRepository, BestFriendRepository bestFriendRepository, AnimalShelterService animalShelterService, ModelMapper modelMapper) {
+    public CatService(CatRepository catRepository, BestFriendRepository bestFriendRepository, AnimalShelterService animalShelterService, ModelMapper modelMapper) {
         this.catRepository = catRepository;
-        this.dogRepository = dogRepository;
         this.bestFriendRepository = bestFriendRepository;
         this.animalShelterService = animalShelterService;
         this.modelMapper = modelMapper;
@@ -74,10 +68,7 @@ public class CatService {
             if (animalShelterService.findByIdForService(command.getAnimalShelterId()) != null) {
                 animalShelterService.findByIdForService(command.getAnimalShelterId()).getCatList().add(toUpdate);
             }
-        } else {
-            throw new CatNotFoundException("Cat not found.", id);
-        }
-
+        } else throw new CatNotFoundException("Cat not found.", id);
         return modelMapper.map(catRepository.update(toUpdate), CatInfo.class);
     }
 
@@ -98,9 +89,7 @@ public class CatService {
         Optional<Cat> found = catRepository.findById(id);
         if (found.isPresent()) {
             return modelMapper.map(found.get(), CatInfo.class);
-        } else {
-            throw new CatNotFoundException("Cat not found.", id);
-        }
+        } else throw new CatNotFoundException("Cat not found.", id);
     }
 
     public List<CatInfo> findAllByGender(Gender gender) {
@@ -124,9 +113,7 @@ public class CatService {
         if (toDeleteOptional.isPresent()) {
             Cat toDelete = toDeleteOptional.get();
             catRepository.catDeceased(toDelete);
-        } else {
-            throw new CatNotFoundException("Cat not found.", id);
-        }
+        } else throw new CatNotFoundException("Cat not found.", id);
     }
 
     public List<CatInfo> whoNeedsToPlay() {
@@ -137,8 +124,7 @@ public class CatService {
             if (hours > 6) {
                 needToPlay.add(cat);
             }
-        }
-        return needToPlay.stream().map(cat -> modelMapper.map(cat, CatInfo.class)).collect(Collectors.toList());
+        } return needToPlay.stream().map(cat -> modelMapper.map(cat, CatInfo.class)).collect(Collectors.toList());
     }
 
     public CatInfo playWithCat(Integer id) throws InterruptedException {
@@ -148,9 +134,7 @@ public class CatService {
             TimeUnit.MILLISECONDS.sleep(1);
             cat.setLastPlay(LocalDateTime.now());
             return modelMapper.map(cat, CatInfo.class);
-        } else {
-            throw new CatNotFoundException("Cat not found.", id);
-        }
+        } else throw new CatNotFoundException("Cat not found.", id);
     }
 
     public void playWithAllCats() throws InterruptedException {

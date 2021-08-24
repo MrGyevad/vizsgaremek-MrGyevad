@@ -27,9 +27,7 @@ public class DogRepository {
     public Optional<Dog> findById(Integer id){
         if (entityManager.find(Dog.class, id) != null){
             return Optional.of(entityManager.find(Dog.class, id));
-        } else {
-            return Optional.empty();
-        }
+        } else return Optional.empty();
     }
 
     public void dogDeceased(Dog toDelete){

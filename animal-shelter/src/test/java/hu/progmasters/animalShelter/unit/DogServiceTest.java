@@ -7,7 +7,6 @@ import hu.progmasters.animalShelter.domain.Gender;
 import hu.progmasters.animalShelter.dto.*;
 import hu.progmasters.animalShelter.exception.DogNotFoundException;
 import hu.progmasters.animalShelter.repository.BestFriendRepository;
-import hu.progmasters.animalShelter.repository.CatRepository;
 import hu.progmasters.animalShelter.repository.DogRepository;
 import hu.progmasters.animalShelter.service.AnimalShelterService;
 import hu.progmasters.animalShelter.service.DogService;
@@ -19,7 +18,6 @@ import org.modelmapper.ModelMapper;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -34,54 +32,26 @@ public class DogServiceTest {
     DogRepository dogRepository = mock(DogRepository.class);
     AnimalShelterService animalShelterService = mock(AnimalShelterService.class);
     BestFriendRepository bestFriendRepository = mock(BestFriendRepository.class);
-    CatRepository catRepository = mock(CatRepository.class);
     ModelMapper modelMapper = new ModelMapper();
 
-    DogService dogService = new DogService(dogRepository, catRepository, animalShelterService, bestFriendRepository, modelMapper);
+    DogService dogService = new DogService(dogRepository, animalShelterService, bestFriendRepository, modelMapper);
 
-    private AnimalShelterCommand animalShelterCommand;
-    private AnimalShelterInfo animalShelterInfo;
     private AnimalShelter animalShelter;
     private Dog dog1;
     private DogCommand dogCommand1;
-    private Dog dog2;
-    private Dog dog3;
-    private DogCommand dogCommand2;
     private DogCommand updateCommand1;
     private DogInfo dogInfo1;
-    private DogInfo dogInfo2;
-    private DogInfo dogInfo3;
     private Dog dogForUpdate;
-    private BestFriendInfo bestFriendInfo1;
-    private BestFriendInfo bestFriendInfo2;
-    private CatInfo catInfo1;
-    private CatInfo catInfo2;
 
     @BeforeEach
-    void init(){
-        String ldt = "2021-08-23 15:40:00";
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        LocalDateTime dateTime = LocalDateTime.parse(ldt, formatter);
-        animalShelterCommand = new AnimalShelterCommand("HopeForPaws");
+    void init() {
+        LocalDateTime dateTime = LocalDateTime.now().minusHours(1);
         animalShelter = new AnimalShelter(1, "HopeForPaws", new ArrayList<>(), new ArrayList<>());
-        animalShelterInfo = new AnimalShelterInfo(1, "HopeForPaws", null, null);
         dog1 = new Dog(1, "Sirion", 6, "Mudi", Gender.SIRE, dateTime, true, false, new BestFriend(1, null, null), new AnimalShelter());
-        dog2 = new Dog(2, "Diego", 11, "Maltese", Gender.SIRE, dateTime, true, false, new BestFriend(2, null, null), new AnimalShelter());
-        dog3 = new Dog(1, "Digi", 11, "Maltese", Gender.SIRE, dateTime, true, false, new BestFriend(1, null, null), new AnimalShelter());
         dogForUpdate = new Dog(1, "Digi", 11, "Maltese", Gender.SIRE, dateTime, true, false, new BestFriend(1, null, null), new AnimalShelter());
         dogCommand1 = new DogCommand("Sirion", 6, "Mudi", Gender.SIRE, dateTime, true, false, 1);
-        dogCommand2 = new DogCommand("Diego", 11, "Maltese", Gender.SIRE, dateTime, true, false, 1);
         updateCommand1 = new DogCommand("Digi", 11, "Maltese", Gender.SIRE, dateTime, true, false, 1);
         dogInfo1 = new DogInfo(1, "Sirion", 6, "Mudi", Gender.SIRE, dateTime, true, false, null);
-        dogInfo2 = new DogInfo(2, "Diego", 11, "Maltese", Gender.SIRE, dateTime, true, false, null);
-        dogInfo3 = new DogInfo(1, "Digi", 11, "Maltese", Gender.SIRE, dateTime, true, false, null);
-        catInfo1 = new CatInfo(1, "Lucifer", 10, "Giant", Gender.TOM,
-                dateTime, true, false, null);
-        catInfo2 = new CatInfo(2, "Ribizli", 5, "Halfear", Gender.PUSSY,
-                dateTime, true, false, null);
-        bestFriendInfo1 = new BestFriendInfo(1, catInfo1, dogInfo1);
-        bestFriendInfo2 = new BestFriendInfo(2, catInfo2, dogInfo2);
-
     }
 
     @Test
@@ -94,12 +64,12 @@ public class DogServiceTest {
 
     @Test
     @Transactional
-    void testSaveDog_SuccessfulSave(){
+    void testSaveDog_SuccessfulSave() {
         when(dogRepository.save(any()))
                 .thenReturn(dog1);
         when(dogRepository.update(any()))
                 .thenReturn(dog1);
-        DogInfo savedDog= dogService.saveDog(dogCommand1);
+        DogInfo savedDog = dogService.saveDog(dogCommand1);
         dogInfo1.setLastWalk(savedDog.getLastWalk());
         assertEquals(dogInfo1, savedDog);
         verify(dogRepository, times(1)).save(any());
@@ -124,14 +94,14 @@ public class DogServiceTest {
 
     @Test
     @Transactional
-    void testUpdateDog_SuccessfulUpdate(){
+    void testUpdateDog_SuccessfulUpdate() {
         when(dogRepository.findById(any()))
                 .thenReturn(Optional.of(dogForUpdate));
         when(dogRepository.update(any()))
                 .thenReturn(dogForUpdate);
         when(dogRepository.save(any())).thenReturn(dog1);
         when(animalShelterService.findByIdForService(any())).thenReturn(animalShelter);
-        DogInfo saved = dogService.saveDog(dogCommand1);
+        dogService.saveDog(dogCommand1);
         assertEquals("Digi", dogService.updateDog(1, updateCommand1).getName());
         verify(dogRepository, times(2)).update(any());
         verify(dogRepository, times(2)).findById(any());
@@ -141,10 +111,8 @@ public class DogServiceTest {
 
     @Test
     @Transactional
-    void testWhoNeedsAWalk_oneDogNeedsAWalk(){
-        String ldt = "2021-08-03 15:40:00";
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        LocalDateTime dateTime = LocalDateTime.parse(ldt, formatter);
+    void testWhoNeedsAWalk_oneDogNeedsAWalk() {
+        LocalDateTime dateTime = LocalDateTime.now().minusHours(8);
         Dog sirion = new Dog(1, "Sirion", 6, "Mudi", Gender.SIRE, dateTime, true, false, new BestFriend(1, null, null), new AnimalShelter());
         when(dogRepository.findAll()).thenReturn(List.of(sirion));
         when(dogRepository.save(any())).thenReturn(sirion);
@@ -163,7 +131,7 @@ public class DogServiceTest {
 
     @Test
     @Transactional
-    void testWhoNeedsAWalk_noOneNeedsAWalk(){
+    void testWhoNeedsAWalk_noOneNeedsAWalk() {
         when(dogRepository.findAll()).thenReturn(List.of(dog1));
         when(dogRepository.save(any())).thenReturn(dog1);
         when(dogRepository.update(any())).thenReturn(dog1);
@@ -180,13 +148,13 @@ public class DogServiceTest {
 
     @Test
     @Transactional
-    void testFindById_SuccessfulFind(){
+    void testFindById_SuccessfulFind() {
         when(dogRepository.findById(1)).thenReturn(Optional.of(dog1));
         when(dogRepository.save(any()))
                 .thenReturn(dog1);
         when(dogRepository.update(any()))
                 .thenReturn(dog1);
-        DogInfo savedDog= dogService.saveDog(dogCommand1);
+        DogInfo savedDog = dogService.saveDog(dogCommand1);
         dogInfo1.setLastWalk(savedDog.getLastWalk());
         assertEquals(dogInfo1, dogService.findById(1));
 
@@ -198,7 +166,7 @@ public class DogServiceTest {
 
     @Test
     @Transactional
-    void testFindById_DogNotFound(){
+    void testFindById_DogNotFound() {
         when(dogRepository.findById(3)).thenThrow(new DogNotFoundException());
         when(dogRepository.findById(1)).thenReturn(Optional.of(dog1));
         when(dogRepository.save(any())).thenReturn(dog1);
@@ -206,9 +174,7 @@ public class DogServiceTest {
         DogInfo savedDog = dogService.saveDog(dogCommand1);
         dogInfo1.setLastWalk(savedDog.getLastWalk());
         assertEquals(dogInfo1, dogService.findById(1));
-        assertThrows(DogNotFoundException.class, () -> {
-            dogService.findById(3);
-        });
+        assertThrows(DogNotFoundException.class, () -> dogService.findById(3));
 
         verify(dogRepository, times(1)).save(any());
         verify(dogRepository, times(1)).update(any());
@@ -235,7 +201,4 @@ public class DogServiceTest {
         verify(dogRepository, times(2)).findById(1);
         verifyNoMoreInteractions(dogRepository);
     }
-
-
-
 }

@@ -13,7 +13,7 @@ import javax.persistence.*;
 public class BestFriend {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @OneToOne(orphanRemoval = true,

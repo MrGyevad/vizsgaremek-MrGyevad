@@ -7,6 +7,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
+
 @SpringBootApplication
 public class AnimalShelterApp {
 
@@ -20,5 +21,4 @@ public class AnimalShelterApp {
         modelmapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         return modelmapper;
     }
-
 }

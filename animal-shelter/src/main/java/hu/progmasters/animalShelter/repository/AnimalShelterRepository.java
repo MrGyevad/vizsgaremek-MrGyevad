@@ -19,9 +19,7 @@ public class AnimalShelterRepository {
         return toSave;
     }
 
-    public AnimalShelter update(AnimalShelter toUpdate) {
-        return entityManager.merge(toUpdate);
-    }
+    public AnimalShelter update(AnimalShelter toUpdate) { return entityManager.merge(toUpdate); }
 
     public List<AnimalShelter> findAll(){
         return entityManager.createQuery("SELECT a FROM AnimalShelter a", AnimalShelter.class)
